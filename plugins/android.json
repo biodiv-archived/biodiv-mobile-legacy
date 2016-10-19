@@ -1,0 +1,75 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "com.ionic.keyboard": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "com.phonegap.plugins.nativesettingsopener": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-background-mode": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-datepicker": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova-plugin-x-toast": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "cordova.plugins.diagnostic": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "io.litehelpers.cordova.sqlite": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "ionic-plugin-keyboard": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "org.apache.cordova.device": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "org.apache.cordova.inappbrowser": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "org.pbernasconi.progressindicator": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "phonegap-plugin-push": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "th.co.snowwhite.imagepicker": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        },
+        "uk.co.whiteoctober.cordova.appversion": {
+            "PACKAGE_NAME": "com.biodiversity.bt"
+        }
+    },
+    "dependent_plugins": {}
+}

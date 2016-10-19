@@ -1,0 +1,86 @@
+<ion-view view-title="About">
+
+<ion-nav-buttons side="left" >
+        <button class="button button-icon  ion-navicon" ng-if = "showMenu" menu-toggle="left">
+        </button>
+ <a href="#/app/login" class="button button-icon icon ion-ios-arrow-back" ng-if = "!showMenu"></a>
+
+      </ion-nav-buttons>
+  <ion-content>
+  <br>
+  <div class="text-center">
+    <b > Version : 0.0.4</b>
+  </div>
+<br>
+
+  <b><i>Login</i></b>
+  <p>You can log in to the portal from this page. If you dont have an account, you can register as a new user from New User button. If you forgot the password you can get it through Forgot Password button</p>
+  <div style="text-align: center">
+    <img src="img/login.png" height="200px"></img>
+  </div>
+<br>
+  <b>Home</b>
+  <p>After you have succesfully logged in, you will be redirected to home page.</p>
+    <div style="text-align: center">
+    <img src="img/home.png" height="200px"></img>
+    </div>
+
+<br>
+  <b>New Observation</b>
+  <p>1.Click the "Add Photos" button to add images from the gallery or take new images with the camera.</p>
+  <p>2. Location and date will be automatically set to the last known place and time as provided by the device. To edit location, click the GPS button and get updated location or click edit location to pinpoint it on a map. Date can be corrected from the date picker.</p>
+  <p>3.If you know the scientific name and common name of the observation, you can enter it or else click on "Help Identify" button</p>
+  <p>4.Select the user groups to which the current observation should be posted to.</p>
+  <p>5.Click submit. The observation will be uploaded instantly if an internet connection is available. If not it will be queued until a connection is available.</p>
+  <ion-scroll direction="x" class="wide-as-needed padding" >
+    <img  src="img/addphotos.png" style="padding:2px" height="200px"/>
+        <img  src="img/location.png" style="padding:2px" height="200px"/>
+    <img  src="img/helpIdentify.png" style="padding:2px" height="200px"/>
+    <img  src="img/selectlocation.png" style="padding:2px" height="200px" />
+   </ion-scroll>
+  <br>
+
+   <b>Browse Observations</b>
+  <p>Click the Browse Observation button and select the species group to bring up the list of latest observations. Observation details can be seen by clicking each observation. Swipe to move to next observation or to go back to previous.</p>
+  <ion-scroll direction="x" class="wide-as-needed padding" >
+      <img src="img/speciegroups.png" style="padding:2px" height="200px"></img>
+
+    <img src="img/observationlist.png" style="padding:2px" height="200px"></img>
+    <img  src="img/details.png" style="padding:2px" height="200px"/>
+        <img  src="img/obsdetail.png" style="padding:2px" height="200px"/>
+
+    </ion-scroll>
+	<br>
+    <b> Observations near me</b>
+  <p>Using this, observations known to exist in nearby locality can be retrieved. Note: If there are no observations on the portal in the immediate region, it will fetch observations that are closest to the current location.</p>
+    <div style="text-align: center">
+    <img src="img/observationlist.png" height="200px"></img>
+    </div>
+  <br>
+  <b>My Observations </b>
+  <p>This will retrieve and display all your uploaded observations.</p>
+    <div style="text-align: center">
+    <img src="img/mycollection.png" height="200px"></img>
+    </div>
+
+    <b>Joined Groups </b>
+  <p>Use this to discover and join all available groups on the portal. Only groups that you join will be available for posting observations during upload.</p>
+    <div style="text-align: center">
+    <img src="img/joingroups.png" height="200px"></img>
+    </div>
+  <br>
+  <b>Observation Queue</b>
+  <p>Observations pending upload or have failed to upload will be displayed here with its upload status. Observations currently being uploaded will show the "processing" status.</p>
+      <div style="text-align: center">
+		<img src="img/queue.png" height="200px"></img>
+		</div>
+<br>
+  <b>Settings</b>
+  <p>Upload over Wifi only: Switch this on to upload only when a wifi connection is enabled.</p>
+  <p>Upload manually only: Prevents automated uploading. Each pending observation will need to be manually enabled for upload.</p>
+
+    <div style="text-align: center">
+    <img src="img/settings.png" height="200px"></img>
+    </div>
+	 </ion-content> 
+</ion-view>

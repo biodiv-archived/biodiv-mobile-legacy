@@ -1,0 +1,13 @@
+"Select an Album" = "Select an Album";
+"Loading" = "Loading...";
+"Error" = "Error";
+"Album Error: %@ - %@" = "Album Error: %@ - %@";
+"Ok" = "Ok";
+"Okay" = "Okay";
+"Select All" = "Select All";
+"Deselect All" = "Deselect All";
+"Pick Photo" = "Pick Photo";
+"Pick Photos" = "Pick Photos";
+"Chosen: %d" = "Chosen: %d";
+"Maximum %d photos." = "Maximum %d photos.";
+"You can only select %d photos at a time." = "You can only select %d photos at a time.";

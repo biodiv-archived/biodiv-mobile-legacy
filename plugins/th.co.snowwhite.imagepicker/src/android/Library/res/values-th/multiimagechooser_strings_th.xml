@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="multi_app_name">MultiImageChooser</string>
+    <string name="free_version_label">ฟรีเวอร์ชั่น ภาพคงเหลือ: %d</string>
+    <string name="error_database">พบความผิดพลาดในฐานข้อมุล โปรดรายงาน</string>
+    <string name="requesting_thumbnails">ตัวอย่างภาพ</string>
+    <string name="discard">ยกเลิก</string>
+    <string name="all">ทั้งหมด</string>
+    <string name="clear">เริ่มใหม่</string>
+    <string name="done">ตกลง</string>
+    <string name="chosen">เลือกแล้ว: </string>
+    <string name="processing">กำลังบันทึกภาพ</string>
+    <string name="processing_time">อาจใช้เวลาสักครู่</string>
+    <string name="max_1">เลือกได้</string>
+    <string name="max_2">ภาพ</string>
+    <string name="max_3">ลูกค้าสามารถเลือกภาพได้ ครั้งละไม่เกิน</string>
+    <string name="max_4">ภาพ แล้วค่อยเพิ่มอีกทีหลังได้ค่ะ</string>
+</resources>
