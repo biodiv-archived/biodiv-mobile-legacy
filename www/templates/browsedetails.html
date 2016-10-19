@@ -1,0 +1,165 @@
+<ion-view >
+<ion-nav-title>
+    <span >{{singleObsDetails[0].scientificName}}</span>
+</ion-nav-title>
+  <ion-nav-buttons side="right">
+    <div  ng-if="vedio">
+   <a class="button button-clear" href="#/app/editObservation/{{singleObsDetails[0].id}}" ng-click="editButton()">
+              Edit
+       </a>
+    </div>
+  </ion-nav-buttons>
+  
+      <ion-nav-buttons side="left">
+
+        <a class="button button-icon ion-chevron-left" ng-click="goBacking()" >
+         </a>
+    </ion-nav-buttons>
+<ion-content  class="padding" id="eventPlaceholder" >
+        
+        <div >
+          <a class="button button-icon ion-chevron-left" ng-click="onSwipeRight()" style="font-size: 25px;"></a>
+          <a class="button button-icon ion-chevron-right" ng-click="onSwipeLeft()"  style="font-size: 25px;float:right;"></a>
+          </div>
+
+      <!--h2 style="padding:10px;font-size:5vw;font-weight:bold;">{{singleObsDetails[0].scientificName}}</h2-->
+      <h2 style="padding:10px;font-weight:bold;">{{singleObsDetails[0].CommonName}}</h2>
+
+       
+         <ion-scroll direction="x" class="wide-as-needed padding" >
+         <img ng-repeat='item in singleImgDetails[0]["image"]' src="{{item.icon}}" style="padding:2px;height:203px;width:203px;" ng-click="showImages($index)" />
+    
+      </ion-scroll>
+      <div on-swipe-right="onSwipeRight()" on-swipe-left="onSwipeLeft()">
+      <br>
+      <h4><b>Submitted by:</b></h4>
+      <p>{{singleObsDetails[0].author}}</p>
+      <h4><b>Place:</b></h4>
+      <p>{{singleObsDetails[0].place}}</p>
+      <h4><b>Observed on:</b></h4>
+      <p>{{singleObsDetails[0].observed}}</p>
+      <h4><b>Submitted:</b></h4>
+      <p>{{singleObsDetails[0].submitted}}</p>
+      <h4><b>Updated:</b></h4>
+      <p>{{singleObsDetails[0].updated}}</p>
+      <h4 ng-if="!visible">Notes:</h4>
+      {{singleObsDetails[0].notes}}
+         
+         <br><br>
+         <div style="border:1px dotted cadetblue;padding:10px 10px 39px 10px;border-radius: 12px;background-color: #a6dfc8;" class='buttonsShow'>
+
+         <ion-list >
+         <div class="listss" >
+            <ion-item ng-if = "checkReco" ng-repeat='reco in agreeDetails track by $index' class="listItem" style="background-color: #eee;white-space: normal;font-size: 13px;padding: 10px;">
+              <b>{{reco.noOfVotes}} user thinks  it is: </b><i style="font-weight: bold;font-style: italic;font-size: 14px;">{{reco.canonicalForm}} </i><b>{{reco.commonNames}}</b>
+              <button class="button button-small button-positive "  ng-click='agreButton({{reco.recoId}})' id="agreeButton{{reco.recoId}}" ng-if="!reco['buttonVal']" style="float:right;margin-right:5px;width: 4em;border-radius: inherit;">Agree</button>
+              <button class="button button-small button-positive"  id='removeButton{{reco.recoId}}' ng-if="reco['buttonVal']" ng-click='removeButton({{reco.recoId}})' style="float:right;margin-right:5px;border-radius: inherit;">Remove </button>
+              <br>
+                 <img ng-repeat='item in reco["userDetails"]' src="{{item.userIcon}}" style="padding:2px;height:38px;border-radius: 50%;" ng-click="openUser({{item.userId}})"/>
+            </ion-item>
+            </div>
+            <ion-item ng-if = "!checkReco" class="listItem" style="color: #468847;background-color: #dff0d8;border-color: #d6e9c6;white-space: normal;font-size: 13px;padding: 10px;">
+              <b>No suggestions for species name. Please suggest</b>
+                
+            </ion-item>
+         </ion-list>
+         <form ng-submit="suggestNames()">
+           <h2 style="color: #73ac13;">Suggest Name</h2>
+           <ion-list>
+              <div class="list" >
+                <!--div style="display:flex;float: right; width: 100%;"-->
+                <div class="item item-input item-select listItem">
+                   <!--input type="text" style="width:100%;height: inherit;" ng-model="suggest.sciName" placeholder="Suggest Scientific Name"-->
+                   <div style="width: 75%;">
+                    <input  ion-autocomplete type="text" readonly="readonly" class="ion-autocomplete" autocomplete="off" item-value-key="showField" item-view-value-key="showField" items-method="getTestItems(query)" items-method-value-key="items" items-clicked-method="nameClicked(callback)" items-removed-method="nameRemoved(callback)" max-selected-items="1" style="width: 75%;white-space: normal;" ng-model="suggest.commonName" placeholder="Common Name"></input>
+                    </div>
+                     <!--select style="border: 1px solid blue;max-width: 30%;float: right;" ng-model='suggest.lang'>
+                    <option ng-repeat='lang in languages' >{{lang}}</option>
+                  </select-->
+                  
+                  <select ng-model='suggest.lang' style="right: -17px;width:150px;">
+                    <option ng-repeat='lang in languages' >{{lang}}</option>
+                    
+                  </select>
+                  </div>
+                 
+                  <!--/div-->
+                  
+                <ion-item class="listItem ">
+                   <input ion-autocomplete type="text" id="sugestName" readonly="readonly" class="ion-autocomplete" autocomplete="off" item-value-key="showField" item-view-value-key="showField" items-method="getScientificItems(query)" items-method-value-key="items" items-clicked-method="itemsClicked(callback)" items-removed-method="itemsRemoved(callback)" max-selected-items="1" style="width:100%;height: 18px;" ng-model="suggest.sciName " placeholder="Suggest Scientific Name"></input>
+                </ion-item>
+                <ion-item class="listItem">
+                 <textarea type="text" style="width:100%;height: 18px;" ng-model="suggest.comment" placeholder="Write comment on species call"></textarea>
+                </ion-item>
+              </div>
+            </ion-list>
+            <label>
+            <button class="button button-small button-positive" type="submit" style="float:right;margin-right:5px;width: 4em;">Add</button>
+          </label>
+         </form>
+         </div>
+         <br>
+
+         <div ng-if="showMyGroups" ng-init="isHidden=true" >
+            <a class="button" ng-click="isHidden=!isHidden" style="background-color: #452715;color: white;border-radius: 6px;">Post To Groups</a>
+            <div class="my-show-hide-animation" ng-hide="isHidden" >
+                  <br>
+                <ion-checkbox ng-repeat="group in userGroups" ng-model="group.enabled">{{group.name}}</ion-checkbox>
+                <button class="buttton button-small" style="float:right;margin-right:5px;width: 4em;background-color:#006dcc;" ng-click="postGroup('post'); isHidden=!isHidden" >Post</button>
+                <button class="buttton button-small" style="float:right;margin-right:5px;width: 5em;background-color:#bd362f;" ng-click="postGroup('remove');isHidden=!isHidden">Unpost</button>
+              <br>
+            </div>
+          </div>
+
+         <br>
+        <div style="border:1px dotted greenyellow;padding:10px 10px 39px 10px;border-radius: 12px;background-color: #a6dfc8;">
+        <form ng-submit="postComments()">
+         <h2 style="color: #73ac13;">Activity Feeds</h2>
+          <ion-list>
+            <div class="list" style="padding:10px">
+             <ion-item ng-repeat='comment in commentList track by $index' class="listItem" style="background-color: #eee;white-space: normal;font-size: 13px;padding: 10px;">
+             <img  src="{{comment.userIcon}}" style="padding:2px;height:38px;float:left;border-radius: 50%;" ng-click="openUser({{comment.userId}})"/>
+                <b> {{comment.userName}} :<span style="color:green;"> {{comment.activityAction}} <i style="color:gray;">{{comment.activityName}}</i></a></span></b>
+               <div ng-if="comment.activityAction==''" ng-click="replyToComment(comment.commentId)">
+                <i  style="float: right;font-size: large;margin-left: 6px;"  class="icon  ion-reply"></i>
+                </div>
+                <div ng-if="(comment.userId == userValue) && (comment.activityAction=='')" ng-click="editComment(comment.commentId, comment.activityName)">
+                <i   style="float: right;font-size: small;margin-left: 6px;" class="icon ion-edit"></i>
+                </div>
+                 <p style="float: right">{{comment.date}}</p>
+                <div ng-if = "(comment.activityAction=='') && (replyDiv) && (comment.commentFlag) ">
+                <textarea  style="width:100%;white-space: normal;padding: 0px;" ng-model="reply.replyText" placeholder="reply on comment"></textarea>
+                <button class="button button-small button-positive" type="button" ng-click="postReply({{comment.commentId}})" style="float:right;margin-right:5px;font-size: 12px;min-width: 47px;height: 10px;min-height: 23px;margin-top: 7px;padding: 0px;">Post</button>
+                <button class="button button-small button-positive" type="button" ng-click="hideDiv()" style="float:right;margin-right:5px;font-size: 12px;min-width: 47px;height: 10px;min-height: 23px;margin-top: 7px;padding: 0px;">Cancel</button>
+                </div>
+               
+                <div ng-if = "(comment.activityAction=='') && (editDiv) && (comment.commentFlag) ">
+                <textarea  style="width:100%;white-space: normal;padding: 0px;" ng-model="edit.editText" placeholder="Edit comment"></textarea>
+                <button class="button button-small button-positive" type="button" ng-click="updateComment(comment.commentId, comment.activityName)" style="float:right;margin-right:5px;font-size: 12px;min-width: 47px;height: 10px;min-height: 23px;margin-top: 7px;padding: 0px;">Update</button>
+                <button class="button button-small button-positive" type="button" ng-click="deleteComment(comment.commentId)" style="float:right;margin-right:5px;font-size: 12px;min-width: 47px;height: 10px;min-height: 23px;margin-top: 7px;padding: 0px;">Delete</button>
+                
+                </div>
+               
+
+             </ion-item>
+              <button type="button" ng-if="showMore" ng-click = "showMoreButton()" class="button button-small button-positive"  style="float:right;margin-right:5px;">Show More</button>
+             <br><br>
+              <ion-item class="listItem">
+               <textarea  style="width:100%;white-space: normal;padding: 0px;" ng-model="comment.text" placeholder="Write comment"></textarea>
+             </ion-item>
+            </div>
+          </ion-list>
+           <label>
+              <button class="button button-small button-positive" type="submit" style="float:right;margin-right:5px;width: 4em;">POST</button>
+            </label>
+         </form>
+        </div>
+      <br>      
+      </div>
+       <div >
+          <a class="button button-icon ion-chevron-left" ng-click="onSwipeRight()" style="font-size: 25px;"></a>
+          <a class="button button-icon ion-chevron-right" ng-click="onSwipeLeft()"  style="font-size: 25px;float:right;"></a>
+          </div>
+          <br>
+    </ion-content> 
+</ion-view>
