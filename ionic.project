@@ -1,0 +1,10 @@
+{
+  "name": "India Biodiversity Portal",
+  "app_id": "e2179cec",
+  "proxies": [
+    {
+      "path": "/api",
+      "proxyUrl": "http://biodiversity.bt/api"
+    }
+  ]
+}
