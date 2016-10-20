@@ -1,0 +1,19 @@
+
+<ion-view view-title="Location" >
+<div class="bar bar-header bar-positive">
+ <button class="button button-icon icon ion-ios-arrow-back" ng-click="goToNew()"></button>
+  <h1 class="title">Location</h1>
+  <button class="button button-clear" ng-click="registerLocation()" style="background-color: burlywood;width: 2em;">
+        ok
+      </button>
+</div>
+<ion-content >
+  <br><br>
+
+<div>
+<!--pre id="texttop">Loading</pre-->
+<input type="text" id="texttop" style="width:100%;height: 3em" g-places-autocomplete  ng-model="myScopeVar" placeholder="Enter Location" />
+</div>
+    <div id="map" data-tap-disabled="true"></div>
+</ion-content>
+</ion-view>

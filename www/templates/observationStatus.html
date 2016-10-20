@@ -1,0 +1,87 @@
+<ion-view cache-view="false" view-title="{{'obsQueue' | translate}}">
+
+<ion-tabs class="tabs-positive tabs-icon-top">
+ 
+  <ion-tab title="{{'obsPend' | translate}}" icon-on="ion-ios-clock" icon-off="ion-ios-clock-outline">
+<!--ion-nav-buttons side="right">
+   
+   <a class="button button-icon  ion-ios-gear-outline" href="#/app/settings"></a>
+  </ion-nav-buttons-->
+  <ion-content >
+  <a ng-if="pendingObservation && obsStatusList" class="button button-positive" ng-click="execPendingObservation()" style="top: 4px;width: 100%;border-radius: 15px; ">{{'submitPending' | translate}}</a>
+   
+  <div ng-if="obsStatusList" >
+         <ion-list class="item-icon-right">
+           <ion-item class="item-thumbnail-left item-button-right item-text-wrap" ng-repeat='item in details track by $index' href="#/app/statusDetails/{{item.id}}" ng-if="!item['showGPS'] && item['status'] != 'FAILED' || item['status'] != 'Échoué'">
+             <img src="{{item.imgArr[0]['path']}}" alt="{{item.sciName}} photo">
+             <h2>{{item.sciName}}</h2>
+             <p>{{item.status}}</p>
+             <!--progress max="100" value="0" id="ft-prog"></progress-->
+             <div id="myProgress" ng-if ="item['status']=='PROCESSING' || item['status'] != 'En traitement'">
+              <div id="ft-prog"></div>
+            </div>
+             <i ng-if="!item['showGPS']" class="icon ion-chevron-right "></i>
+             <button class="button button-large ion-ios-location "  ng-if="item['showGPS']"  style="color : red;" ng-click='locationFind("{{item.id}}");'></button>
+           </ion-item>
+           <ion-item class="item-thumbnail-left item-button-right" ng-repeat='item in details track by $index' style="background-color:transparent;" ng-if="item['showGPS']">
+             <img src="{{item.imgArr[0]['path']}}" alt="{{item.sciName}} photo">
+             <h2>{{item.sciName}}</h2>
+             <p>{{item.status}}</p>
+             <i ng-if="!item['showGPS']" class="icon ion-chevron-right "></i>
+             <button class="button button-large ion-ios-location "  ng-if="item['showGPS']"  style="color : red;" ng-click='locationFind("{{item.id}}");'></button>
+           </ion-item>
+         </ion-list>
+         
+        </div> 
+        <div ng-if="!obsStatusList" scroll="false" class="wrapper text-center">
+        <p style="text-align: center;">{{'noPending' | translate}}</p>
+        <a class="button button-block button-positive " style="border-radius: 7px;" ng-click="goNewObs()" >
+          {{'newObservation' | translate}}
+        </a>
+        </div>
+        </ion-content>
+         <ion-footer-bar  ng-if="obsStatusList" class="bar-positive footerBar" style="border-radius: 10px;">
+          <div class="title" ng-click="goNewObs()">{{'newObservation' | translate}}</div>
+        </ion-footer-bar>
+         
+  </ion-tab>
+<ion-tab title="{{'obsFail' | translate}}" icon-on="ion-ios-close" icon-off="ion-ios-close-outline">
+<!--ion-nav-buttons side="right">
+   
+   <a class="button button-icon  ion-ios-gear-outline" href="#/app/settings"></a>
+  </ion-nav-buttons-->
+  <ion-content >
+  <a ng-if="pendingObservation && obsStatusFailedList" class="button button-positive" ng-click="execFailedObservation()" style="top: 4px;width: 100%;border-radius: 15px; ">{{'submitFailed' | translate}}</a>
+   
+  <div ng-if="obsStatusFailedList" >
+         <ion-list class="item-icon-right">
+           <ion-item class="item-thumbnail-left item-button-right item-text-wrap" ng-repeat='item in details track by $index' href="#/app/statusDetails/{{item.id}}" ng-if="!item['showGPS'] && item['status'] == 'FAILED' || item['status'] != 'Échoué'">
+             <img src="{{item.imgArr[0]['path']}}" alt="{{item.sciName}} photo">
+             <h2>{{item.sciName}}</h2>
+             <p>{{item.status}}</p>
+             <!--progress max="100" value="0" id="ft-prog"></progress-->
+             <div id="myProgress" ng-if ="item['status']=='PROCESSING' || item['status'] != 'En traitement'">
+              <div id="ft-prog"></div>
+            </div>
+             <i ng-if="!item['showGPS']" class="icon ion-chevron-right "></i>
+             <button class="button button-large ion-ios-location "  ng-if="item['showGPS']"  style="color : red;" ng-click='locationFind("{{item.id}}");'></button>
+           </ion-item>
+           
+         </ion-list>
+         
+        </div> 
+        <div ng-if="!obsStatusFailedList" scroll="false" class="wrapper text-center">
+        <p style="text-align: center;">{{'noFailed' | translate}}</p>
+        <a class="button button-block button-positive " style="border-radius: 7px;" ng-click="goNewObs()" >
+          {{'newObservation' | translate}}
+        </a>
+        </div>
+        </ion-content>
+         <ion-footer-bar  ng-if="obsStatusFailedList" class="bar-positive footerBar" style="border-radius: 10px;">
+          <div class="title" ng-click="goNewObs()">{{'newObservation' | translate}}</div>
+        </ion-footer-bar>
+         
+  </ion-tab>
+
+</ion-tabs>
+  </ion-view>

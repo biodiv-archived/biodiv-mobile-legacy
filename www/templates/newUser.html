@@ -1,0 +1,37 @@
+<ion-view  >
+ <div class="bar bar-header bar-positive">
+ <a href="#/app/newUser" class="button button-icon icon ion-ios-arrow-back"></a>
+  <h1 class="title">{{'register' | translate}}</h1>
+</div>
+  <ion-content>
+  <br><br><br>
+    <form ng-submit="doRegister()">
+      <div class="list" style="padding:10px;">
+        <label class="item item-input listItem check1">
+          <!--span class="input-label">Username :</span-->
+          <input type="text" ng-model="register.email" placeholder="{{'email' | translate}}">
+        </label>
+        <label class="item item-input listItem check1">
+          <!--span class="input-label">Password :</span-->
+          <input type="password" ng-model="register.password" placeholder="{{'password' | translate}}">
+        </label>
+        <label class="item item-input listItem check1">
+          <!--span class="input-label">Username :</span-->
+          <input type="text" ng-model="register.name" placeholder="{{'name' | translate}}">
+        </label>
+        <ion-item class="listItem">
+        <span id="Locationvalue1" ng-model="register.location">Location</span>
+        <a ng-click="editGPS()" class="button button-small alignright" >Edit</a>
+         </ion-item>
+        
+      </div>
+         <div style="border:0px;">
+          <button class="button button-block button-positive " type="submit" s>{{'register' | translate}}</button>
+       
+      </div>
+      <div class="modal1"></div>
+    </form>
+  </ion-content>
+</ion-view>
+
+

@@ -1,0 +1,20 @@
+
+<ion-view view-title="{{'location' | translate}}" >
+
+<ion-nav-buttons side="right">
+<button class="button button-clear" ng-click="statusLocation()">
+        {{'ok' | translate}}
+      </button>
+</ion-nav-buttons>
+        <ion-nav-buttons side="left">
+
+        <a class="button button-icon ion-chevron-left" ng-click="goStatus()" >
+         </a>
+    </ion-nav-buttons>
+<ion-content >
+<div>
+<pre id="texttop">{{'loading' | translate}}</pre>
+</div>
+    <div id="map" data-tap-disabled="true"></div>
+</ion-content>
+</ion-view>

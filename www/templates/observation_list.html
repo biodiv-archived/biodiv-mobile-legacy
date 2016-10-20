@@ -1,0 +1,28 @@
+<ion-view view-title="{{'observation' | translate}}">
+<ion-nav-buttons side="left">
+        <button class="button button-icon  ion-navicon" menu-toggle="left">
+        </button>
+      </ion-nav-buttons>
+      
+  <ion-content  >
+  <div class="modal1"></div>
+         <ion-list class="item-icon-right">
+         <ion-item class="item-thumbnail-left item-text-wrap" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
+         <img src="{{item.iconUrl}}" alt="{{item.sciName}} photo">
+         <h2>{{item.scientificName}}</h2>
+         <p>{{item.CommonName}}</p>
+         <i class="icon ion-chevron-right "></i>
+         </ion-item>
+
+         </ion-list>
+         <ion-infinite-scroll
+            on-infinite="loadMore()"
+            distance="1%">
+          </ion-infinite-scroll>
+         
+        </ion-content> 
+         <ion-footer-bar class="bar-positive" style="border-radius: 10px;">
+      <div class="title" ng-click="enableMap()">{{'viewonMap' | translate}}</div>
+    </ion-footer-bar>
+        
+</ion-view>

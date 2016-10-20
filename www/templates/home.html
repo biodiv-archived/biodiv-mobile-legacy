@@ -1,0 +1,18 @@
+<ion-view view-title="{{'home' | translate}}">
+<ion-nav-buttons side="left">
+        <button class="button button-icon  ion-navicon" menu-toggle="left">
+        </button>
+      </ion-nav-buttons>
+  <ion-content scroll="false">
+          <!-- The content of the page scroll="false" ng-click="goNewObs()" -->
+          <div class="wrapper text-center">
+          <a class="button button-positive buttontop" ng-click="goNewObs()">
+   <p translate="{{ 'newObservations' }}"></p> 
+</a><br>
+
+<a class="button button-positive buttontop"  ng-click="goBrowseObs()">
+   <p translate="{{ 'browseObservations' }}"></p> 
+</a>
+</div>
+        </ion-content> 
+</ion-view>

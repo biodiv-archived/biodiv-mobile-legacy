@@ -1,0 +1,88 @@
+<ion-view view-title="{{'editObservation' | translate}}">
+<ion-nav-buttons side="left">
+        <button class="button button-icon  ion-navicon" menu-toggle="left">
+        </button>
+      </ion-nav-buttons>
+  <ion-content >
+  <form ng-submit="submitNewObs()">
+  
+  <div ng-if="imgURI.length > 0" style="padding:10px;" id="imgContent">
+
+  <ion-scroll direction="x" style="height:250px; min-height: 200px; overflow: scroll; white-space: nowrap;">
+  <div class="img-wrap"  ng-repeat="images in imgURI" id="{{images.id}}">
+  <span class="close" ng-click="removeImage({{images.id}})">&times;</span>
+      <img  ng-src="{{images.path}}" id="{{images.valId}}" style="height:200px;width:150px; padding: 5px 5px 5px 5px;"/>
+      <div class="licImage">
+      <img ng-src="img/{{images.licImgg}}" ng-click="showLicense({{images.id}});"/>
+      </div>
+      </div>
+    </ion-scroll>
+    
+
+    
+  	</div>
+
+<br><br>
+<div class="text-center">
+     <a class="button button-positive listItem " ng-click="addMedia()" >{{'addPhotos' | translate}}</a>
+</div>
+<br>
+<br>
+
+  	 <ion-list class="item-icon-right" >
+  	 <div class="list" style="padding:10px;">
+         <!--ion-item class="listItem" >
+        <span >Select Category </span>
+         <i class="icon ion-chevron-right "></i>
+         </ion-item-->
+         <ion-item class="listItem item-input" id="dateSight" ng-click="openDate()">
+        <span class="input-label" >{{'dateSighted' | translate}} </span>{{newobs.date}}
+         <i class="icon ion-chevron-right "></i>
+         </ion-item>
+         <ion-item class="listItem">
+        <input type="text" id="Locationval" ng-model="newobs.location" style="width:100%;"></input>
+        <a ng-click="gps()" class="button button-small alignright" >{{'edit' | translate}}</a>
+         </ion-item>
+         </div>
+         </ion-list>
+
+         <ion-checkbox style="margin:0px 10px 0px 10px;" id="check" ng-model="newobs.boxVal" ng-init="checked=true" class="listItem" >{{'helpIdentify' | translate}}</ion-checkbox>
+
+         <br>
+
+
+          <ion-list>
+          <div class="list" style="padding:10px;">
+          <ion-item ng-if="!newobs.boxVal" class="listItem check1">
+           <input ion-autocomplete type="text" readonly="readonly" class="ion-autocomplete" autocomplete="off" item-value-key="showField" item-view-value-key="showField" items-method="getTestItems(query)" items-method-value-key="items" items-clicked-method="itemsClicked(callback)" items-removed-method="itemsRemoved(callback)" max-selected-items="1" style="width:100%" ng-model="newobs.sciName"  model-to-item-method="modelToItemMethod(modelValue)" placeholder="{{'scientificName' | translate}}">
+          </ion-item>
+          <ion-item ng-if="!newobs.boxVal" class="listItem check1">
+           <input ion-autocomplete type="text" readonly="readonly" class="ion-autocomplete" autocomplete="off" item-value-key="showField" item-view-value-key="showField" items-method="getSuggestName(query)" items-method-value-key="items" items-clicked-method="nameClicked(callback)" items-removed-method="nameRemoved(callback)" max-selected-items="1" style="width:100%" ng-model="newobs.commonName"  model-to-item-method="modelToItem(modelValue)" placeholder="{{'suggestCommonName' | translate}}">      
+          </ion-item>
+          <ion-item class="listItem">
+          <input type="text" style="width:100%" ng-model="newobs.notes" placeholder="{{'notes' | translate}}">
+          </ion-item>
+          </div>
+          </ion-list>
+
+           <ion-list class="item-icon-right" >
+  	 <div class="list" style="padding:10px;">
+         <ion-item class="listItem" ng-click="userGroup();">
+        <span >{{'selectGroups' | translate}} </span>
+         <i class="icon ion-chevron-right "></i>
+         <p class="alignright" id="uGroupText" style="margin-right:20px;"></p>
+         </ion-item>
+         </div>
+         </ion-list>
+
+         <button ng-if="submitObsVal" class="button button-full button-positive" type="submit" style="border-radius: 7px;">{{'submit' | translate}}</button>
+         <br>
+         <div style="text-align: center;">
+          <button ng-if="!submitObsVal" class="button  button-positive" type="submit" style="border-radius: 7px;width:40%;">{{'submitEdit' | translate}}</button>
+
+          <a ng-if="!submitObsVal" class="button  button-positive" ng-click="deleteObs()" style="border-radius: 7px;width:40%;margin-left: 8px;">{{'delete' | translate}}</a>
+        </div>
+   </form>
+
+  </ion-content>
+</ion-view>

@@ -1,0 +1,43 @@
+<ion-view title={{singleObsDetails[0].scientificName}}>
+ <ion-nav-bar class="bar-positive">
+      <ion-nav-buttons side="left">
+
+        <a class="button button-icon ion-chevron-left" ng-click="goStatus()" >
+         </a>
+    </ion-nav-buttons>
+      </ion-nav-bar>
+  <ion-content  class="padding" >
+        
+
+  		<h2 style="padding:10px">{{singleObsDetails[0].scientificName}}</h2>
+  		<h3 style="padding:10px">{{singleObsDetails[0].CommonName}}</h3>
+
+       
+       <ion-scroll direction="x" class="wide-as-needed padding" >
+         <img ng-repeat='item in singleImgDetails[0]["image"]' src="{{item.path}}" style="padding:2px;height:35%;width:45%;" /> 
+    
+      </ion-scroll>
+
+      <br>
+      <h4><b>{{'place' | translate}}:</b></h4>
+      <p>{{singleObsDetails[0].place}}</p>
+      <h4><b>{{'observedOn' | translate}}:</b></h4>
+      <p>{{singleObsDetails[0].observed}}</p>
+      <h4><b>{{'submitted' | translate}}:</b></h4>
+      <p>{{singleObsDetails[0].submitted}}</p>
+      <h4><b>{{'updated' | translate}}:</b></h4>
+      <p>{{singleObsDetails[0].updated}}</p>
+      <h4 ng-if="!visible">{{'notes' | translate}}:</h4>
+      {{singleObsDetails[0].notes}}
+
+      <br>
+        <div style="text-align: center;">
+
+          <button ng-if="ShowSubmitButton" class="button button-positive" ng-click="submitFailedObs()" style="border-radius: 7px;width:40%;">{{'reSubmit' | translate}}</button>
+        <button ng-if="ShowSubmitButton" class="button  button-positive" ng-click="deleteObs()" style="border-radius: 7px;width:40%;margin-left: 8px;">{{'delete' | translate}}</button>
+        </div>
+         <button ng-if="!ShowSubmitButton" class="button button-full button-positive" ng-click="deleteObs()" style="border-radius: 7px;">{{'delete' | translate}}</button>
+       <br>
+         
+  </ion-content> 
+</ion-view>

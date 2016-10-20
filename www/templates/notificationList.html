@@ -1,0 +1,33 @@
+<ion-view view-title="{{'notifications' | translate}}">
+<ion-nav-buttons side="right">
+    <div >
+   <a class="button button-clear" ng-click="sendNewNotification()" ng-if="sendNotify">
+              {{'send' | translate}}
+       </a>
+    </div>
+  </ion-nav-buttons>
+<ion-nav-buttons side="left">
+        <button class="button button-icon  ion-navicon" menu-toggle="left">
+        </button>
+      </ion-nav-buttons>
+  <ion-content >
+  <div class="modal1"></div>
+
+  <ion-list>
+  <ion-item ng-repeat="item in items" ng-click="showImages(item.id)">
+    {{item.title}}
+  </ion-item>
+</ion-list>
+<ion-infinite-scroll
+on-infinite="loadMore()"
+distance="1%" ng-if="hasMoreData">
+</ion-infinite-scroll>
+
+	<div id="noNotifications" style="display:none;" class="wrapper text-center">
+	<ion-item>
+        <p style="text-align: center;"> {{'noNotification' | translate}}</p>
+     </ion-item>   
+    </div>
+
+  </ion-content>
+</ion-view>

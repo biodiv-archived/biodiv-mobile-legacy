@@ -1,0 +1,32 @@
+  <ion-modal-view>
+      <ion-header-bar style="background: url('file:///android_asset/www/img/title_bar_bg.png');">
+      <a class="button button-clear" style="color:#a52a2a" ng-click="closeModal()">
+             {{'close' | translate}} 
+       </a>
+      <h1 class="title" >{{'notifications' | translate}}</h1>
+
+    </ion-header-bar>
+
+<ion-content>
+<div class="modal1"></div>
+<div ng-if="checkValue" class="card text-center" >
+  <div class="item item-divider">
+  		{{items[itemVal].title}}
+  </div>
+  <div class="item item-text-wrap">
+  <p ng-bind-html="items[itemVal].desc | htmlContent"></p>
+
+  </div>
+  <div class="item item-divider">
+  		{{items[itemVal].time}}
+  </div>
+</div>
+<!--div ng-if="!checkValue">
+	<form ng-submit="pushNotification()">
+	<textarea type="text" style="width:100%;height:30px;margin-top:10px" ng-model="text.title" placeholder="Title"></textarea>	
+	<textarea type="text" style="width:100%;height:100px;margin-top:20px" ng-model="text.description" placeholder="Push message"></textarea>
+	<button class="button button-small button-positive" type="submit" style="float:right;margin-right:5px;width: 4em;">PUSH</button>
+	</form>
+</div-->
+</ion-content>
+</ion-modal-view>

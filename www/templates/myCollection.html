@@ -1,0 +1,31 @@
+
+<ion-view view-title="{{'myObs' | translate}}">
+  <ion-content >
+      <div class="modal1"></div>
+
+  <div id="myCollectionList" style="display:none;">
+         <ion-list class="item-icon-right">
+         <ion-item class="item-thumbnail-left" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
+         <img src="{{item.iconUrl}}" alt="{{item.sciName}} photo">
+         <h2>{{item.scientificName}}</h2>
+         <p>{{item.CommonName}}</p>
+         <i class="icon ion-chevron-right "></i>
+         </ion-item>
+         </ion-list>
+         <ion-infinite-scroll
+         immediate-check="false"
+         ng-if="!noMoreItemsAvailable"
+		    on-infinite="loadMore()"
+		    distance="10%"
+		    >
+		  </ion-infinite-scroll>
+        </div> 
+        <div id="myCollectionMsg" style="display:none;" class="wrapper text-center">
+        <p style="text-align: center;">{{'submitmsg' | translate}}</p>
+        <a class="button button-block button-positive " style="border-radius: 7px;" ng-click="goNewObs()" >
+          {{'newObservation' | translate}}
+        </a>
+        </div>
+        </ion-content>
+</ion-view>
+

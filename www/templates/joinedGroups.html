@@ -1,0 +1,19 @@
+<ion-view view-title="{{'joinedGroups' | translate}}">
+  <ion-content >
+    <div class="modal1"></div>
+
+  		<div id="join">
+         <ion-list class="item-icon-right">
+         <ion-item class="item item-button-right" ng-repeat='item in usrGrpDetails' style="background-color:#D9EDF7">
+         <h2>{{item.name}}</h2>
+         <button class="button button-large button-balanced" id="button{{item.id}}" ng-click='join("{{item.id}}","{{item.name}}");'>{{'join' | translate}}</button>
+         <i class="icon" id="joinedicon{{item.id}}" ></i>
+         </ion-item>
+         </ion-list>
+         <ion-infinite-scroll
+            on-infinite="loadMore()"
+            distance="1%" ng-if="noMoreGroups">
+          </ion-infinite-scroll>
+         </div>
+        </ion-content> 
+</ion-view>
