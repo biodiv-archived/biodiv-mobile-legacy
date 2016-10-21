@@ -5,7 +5,7 @@
       </ion-nav-back-button-->
 
       <ion-nav-buttons side="left">
-        <button class="button button-icon  ion-navicon" menu-toggle="left" style="color: #452715;">
+        <button class="button button-icon  ion-navicon" menu-toggle="left" style="color:#a52a2a;">
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
@@ -14,55 +14,55 @@
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-stable" style="background: url('../img/title_bar_bg.png');">
-      <h1 class="title">Menu</h1>
+      <h1 class="title">{{"menu" | translate}}</h1>
     </ion-header-bar>
     <ion-content ng-controller="LogoutController">
       <ion-list>
         
        
-        <ion-item menu-close href="#/app/home" class="item item-icon-left">
+        <ion-item menu-close ng-click="goToHome()" class="item item-icon-left" style="background-color: #D9EDF7;">
         <i class=" icon ion-ios-home"></i>
-          Home
+          {{"home" | translate}}
         </ion-item>
-        <ion-item menu-close ng-click="goToNewObs()" class="item item-icon-left" style="background-color: #e7e5b4;">
+        <ion-item menu-close ng-click="goToNewObs()" class="item item-icon-left" style="background-color: #D9EDF7;">
         <i class=" icon ion-ios-plus"></i>
-          New observation
+          {{"newObservation" | translate}}
         </ion-item>
-        <ion-item menu-close ng-click="goToBrowseObs()" class="item item-icon-left" style="background-color: #e7e5b4;">
+        <ion-item menu-close ng-click="goToBrowseObs()" class="item item-icon-left" style="background-color: #D9EDF7;">
         <i class=" icon ion-android-list"></i>
-          Browse Observations
+          {{"browseObs" | translate}}
         </ion-item>
-        <ion-item menu-close ng-click="goToObsNearby()" class="item item-icon-left" style="background-color: #e7e5b4;">
+        <ion-item menu-close ng-click="goToObsNearby()" class="item item-icon-left" style="background-color: #D9EDF7;">
         <i class=" icon ion-location"></i>
-          Observations near me
+          {{"obsNear" | translate}}
         </ion-item>
         <ion-item menu-close href="#/app/joinedGroups" class="item item-icon-left">
           <i class=" icon ion-pricetags"></i>
-          Joined groups
+          {{"joinedGroups" | translate}}
         </ion-item>
-        <ion-item menu-close  ng-click="goToMyCollection()" class="item item-icon-left" style="background-color: #e7e5b4;">
+        <ion-item menu-close  ng-click="goToMyCollection()" class="item item-icon-left" style="background-color: #D9EDF7;">
           <i class=" icon ion-ios-briefcase"></i>
-          My Observations
+          {{"myObs" | translate}}
         </ion-item>
         <ion-item menu-close href="#/app/observationStatus" class="item item-icon-left">
           <i class=" icon ion-ios-list-outline"></i>
-           Observation queue
+           {{"obsQueue" | translate}}
         </ion-item>
-          <ion-item menu-close href="#/app/settings" class="item item-icon-left">
+        <ion-item menu-close href="#/app/settings" class="item item-icon-left">
           <i class=" icon ion-ios-gear-outline"></i>
-            Settings
+            {{"setting" | translate}}
         </ion-item>
         <ion-item menu-close href="#/app/notification" class="item item-icon-left">
           <i class=" icon ion-android-notifications"></i>
-            Notifications
+            {{"notifications" | translate}}
         </ion-item>
         <ion-item menu-close href="#/app/aboutUs/1" class="item item-icon-left">
           <i class=" icon ion-ios-information"></i>
-            About
+            {{"about" | translate}}
         </ion-item>
-        <ion-item menu-close class="item item-icon-left" ng-click="logout()" style="background-color: #e7e5b4;">
+        <ion-item menu-close class="item item-icon-left" ng-click="logout()" style="background-color: #D9EDF7;">
           <i class=" icon ion-power"></i>
-          Logout
+          {{"logout" | translate}}
         </ion-item>
       </ion-list>
     </ion-content>

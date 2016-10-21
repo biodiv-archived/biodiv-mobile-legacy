@@ -1,10 +1,11 @@
 
-<ion-view view-title="My Observations">
+<ion-view view-title="{{'myObs' | translate}}">
   <ion-content >
-  <div class="modal1"></div>
+      <div class="modal1"></div>
+
   <div id="myCollectionList" style="display:none;">
          <ion-list class="item-icon-right">
-         <ion-item class="item-thumbnail-left item-text-wrap" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
+         <ion-item class="item-thumbnail-left" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
          <img src="{{item.iconUrl}}" alt="{{item.sciName}} photo">
          <h2>{{item.scientificName}}</h2>
          <p>{{item.CommonName}}</p>
@@ -14,15 +15,15 @@
          <ion-infinite-scroll
          immediate-check="false"
          ng-if="!noMoreItemsAvailable"
-		    on-infinite="loadMore()"
-		    distance="10%"
-		    >
-		  </ion-infinite-scroll>
+            on-infinite="loadMore()"
+            distance="10%"
+            >
+          </ion-infinite-scroll>
         </div> 
         <div id="myCollectionMsg" style="display:none;" class="wrapper text-center">
-        <p style="text-align: center;">You dont have any observation submitted</p>
+        <p style="text-align: center;">{{'submitmsg' | translate}}</p>
         <a class="button button-block button-positive " style="border-radius: 7px;" ng-click="goNewObs()" >
-          New Observation
+          {{'newObservation' | translate}}
         </a>
         </div>
         </ion-content>

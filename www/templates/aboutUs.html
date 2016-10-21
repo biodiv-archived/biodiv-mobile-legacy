@@ -1,4 +1,4 @@
-<ion-view view-title="About">
+<ion-view view-title="{{'about' | translate}}">
 
 <ion-nav-buttons side="left" >
         <button class="button button-icon  ion-navicon" ng-if = "showMenu" menu-toggle="left">
@@ -9,78 +9,87 @@
   <ion-content>
   <br>
   <div class="text-center">
-    <b > Version : 2.1.5</b>
+    <b > Version : 2.0.9</b>
   </div>
 <br>
 
-  <b><i>Login</i></b>
-  <p>You can login in to the portal from this page. If you dont have a account you can register as a new user from New User button. If you forgot the password you can get it through Forgot Password button</p>
+  <b><i>{{'login' | translate}}</i></b>
+  <p>{{'infoLogin' | translate}}</p>
   <div style="text-align: center">
-    <img src="img/login.png" height="200px"></img>
-  </div>
+  <img src="img/login.jpeg" height="200px"></img>
+</div>
 <br>
-  <b>Home</b>
-  <p>After you succesfully logged in you will be redirected to home page.</p>
+  <b>{{'home' | translate}}</b>
+  <p>{{'infoHome' | translate}}</p>
     <div style="text-align: center">
-    <img src="img/home.png" height="200px"></img>
+    <img src="img/home.jpeg" height="200px"></img>
     </div>
 
 <br>
-  <b>New Observation</b>
-  <p>1.Click the "Add Photos" button to add images from the gallery or take new images with the camera.</p>
-  <p>2. Location and date will be automatically set to the last known place and time as provided by the device. To edit location, click the GPS button and get updated location orclick edit location to pinpoint it on a map. Date can be corrected from the date picker.</p>
-  <p>3.If you know the scientific name and common name of the observation, you can enter it or else click on "Help Identify" button</p>
-  <p>4.Select the user groups to which the current observation should be posted to.</p>
-  <p>5.Click submit. The observation will be uploaded instantly if an internet connection is available. If not it will be queued until a connection is available.</p>
+  <b>{{'newObservation' | translate}}</b>
+  <p>1. {{'infoObs1' | translate}}.</p>
+  <p>2. {{'infoObs2' | translate}} .</p>
+  <p>3. {{'infoObs3' | translate}}</p>
+  <p>4. {{'infoObs4' | translate}}.</p>
+  <p>5. {{'infoObs5' | translate}}.</p>
   <ion-scroll direction="x" class="wide-as-needed padding" >
-    <img  src="img/addphotos.png" style="padding:2px" height="200px"/>
-        <img  src="img/location.png" style="padding:2px" height="200px"/>
-    <img  src="img/helpIdentify.png" style="padding:2px" height="200px"/>
-    <img  src="img/selectlocation.png" style="padding:2px" height="200px" />
+    <img  src="img/addphotos.jpeg" style="padding:2px" height="200px"/>
+        <img  src="img/location.jpeg" style="padding:2px" height="200px"/>
+    <img  src="img/helpIdentify.jpeg" style="padding:2px" height="200px"/>
+    <img  src="img/selectlocation.jpeg" style="padding:2px" height="200px" />
+
+    
    </ion-scroll>
   <br>
 
-   <b>Browse Observations</b>
-  <p>Select the species group to bring up the list of latest observations. Observation details can be seen by clicking each observation. Swipe to move to next observation or go back to previous.</p>
+   <b>{{'browseObs' | translate}}</b>
+  <p>{{'infoBrowse' | translate}}</p>
   <ion-scroll direction="x" class="wide-as-needed padding" >
-      <img src="img/speciegroups.png" style="padding:2px" height="200px"></img>
-
-    <img src="img/observationlist.png" style="padding:2px" height="200px"></img>
-    <img  src="img/details.png" style="padding:2px" height="200px"/>
-        <img  src="img/obsdetail.png" style="padding:2px" height="200px"/>
+    <img src="img/observationlist.jpeg" style="padding:2px" height="200px"></img>
+    <img  src="img/details.jpeg" style="padding:2px" height="200px"/>
+        <img  src="img/obsdetail.jpeg" style="padding:2px" height="200px"/>
 
     </ion-scroll>
-	<br>
-    <b> Observations near me</b>
-  <p>Using this, observations known to exist in nearby can be retrieved. Note: If there are no observations on the portal in the immediate region, it will fetch observations that are closest to the current location.</p>
-    <div style="text-align: center">
-    <img src="img/observationlist.png" height="200px"></img>
-    </div>
   <br>
-  <b>My Observations </b>
-  <p>This will retrieve and display all your uploaded observations.</p>
+    <b>{{'obsNear' | translate}} </b>
+  <p>{{'infoObsNear' | translate}}.</p>
     <div style="text-align: center">
-    <img src="img/mycollection.png" height="200px"></img>
+    <img src="img/observationlist.jpeg" height="200px"></img>
+    </div>
+  
+  <br>
+  <b>{{'myObs' | translate}}</b>
+  <p>{{'infoMyObs' | translate}}.</p>
+    <div style="text-align: center">
+    <img src="img/mycollection.jpeg" height="200px"></img>
     </div>
 
-    <b>Joined Groups </b>
-  <p>Use this to discover and join all available groups on the portal. Only groups that you join will be available for posting observations to, during upload.</p>
-    <div style="text-align: center">
-    <img src="img/joingroups.png" height="200px"></img>
-    </div>
-  <br>
-  <b>Observation Queue</b>
-  <p>Observations that are pending upload or have failed to upload will be displayed here with its upload status. Observations currently being uploaded will show the "processing" status.</p>
-      <div style="text-align: center">
-		<img src="img/queue.png" height="200px"></img>
-		</div>
 <br>
-  <b>Settings</b>
-  <p>Upload over Wifi only: Switch this on to upload only when a wifi connection is enabled.</p>
-  <p>Upload manually only: Prevents automated uploading. Each pending observation will need to be manually enabled for upload.</p>
+
+<b>{{'joinedGroups' | translate}} </b>
+  <p>{{'infoJoined' | translate}}.</p>
+    <div style="text-align: center">
+    <img src="img/joingroups.jpeg" height="200px"></img>
+    </div>
+  <br>
+
+  <b>{{'obsQueue' | translate}}</b>
+  <p>{{'infoObsQueue' | translate}}.</p>
+      <div style="text-align: center">
+    <img src="img/queue.jpeg" height="200px"></img>
+    </div>
+<br>
+<b>{{'setting' | translate}}</b>
+  <p>{{'infoWIFI' | translate}}.</p>
+  <p>{{'infoManual' | translate}}.</p>
 
     <div style="text-align: center">
-    <img src="img/settings.png" height="200px"></img>
-    </div>
-	 </ion-content> 
+    <img src="img/settings.jpeg" height="200px"></img>
+    <br>
+     </div>
+    <b>{{'citation' | translate}}</b>
+   
+    <p>Le Bourgeois Thomas, Grard Pierre, Andrianaivo Alain Paul, Gaungoo Azaad, Ibrahim Yahaya, Randriamampianina Jean Augustin, Balasubramanian D, Marnotte Pascal,  Ramesh BR, Andrianavalona Voah, Hadji Faina, Karthik Yeruva, Ramamonjihasina Marcel, Sathish Kannan, Seechurn Arouna. 2015. WIKWIO Citizen Science - Mobile app. for Android system. European Union programme ACP S&T II, Cirad, IFP, MCIA/MSIRI, FOFIFA, CNDRS eds.</p>
+    <br>
+   </ion-content> 
 </ion-view>

@@ -9,8 +9,8 @@
   <ion-content  class="padding" >
         
 
-  		<h2 style="padding:10px">{{singleObsDetails[0].scientificName}}</h2>
-  		<h3 style="padding:10px">{{singleObsDetails[0].CommonName}}</h3>
+      <h2 style="padding:10px">{{singleObsDetails[0].scientificName}}</h2>
+      <h3 style="padding:10px">{{singleObsDetails[0].CommonName}}</h3>
 
        
        <ion-scroll direction="x" class="wide-as-needed padding" >
@@ -19,24 +19,24 @@
       </ion-scroll>
 
       <br>
-      <h4><b>Place:</b></h4>
+      <h4><b>{{'place' | translate}}:</b></h4>
       <p>{{singleObsDetails[0].place}}</p>
-      <h4><b>Observed on:</b></h4>
+      <h4><b>{{'observedOn' | translate}}:</b></h4>
       <p>{{singleObsDetails[0].observed}}</p>
-      <h4><b>Submitted:</b></h4>
+      <h4><b>{{'submitted' | translate}}:</b></h4>
       <p>{{singleObsDetails[0].submitted}}</p>
-      <h4><b>Updated:</b></h4>
+      <h4><b>{{'updated' | translate}}:</b></h4>
       <p>{{singleObsDetails[0].updated}}</p>
-      <h4 ng-if="!visible">Notes:</h4>
+      <h4 ng-if="!visible">{{'notes' | translate}}:</h4>
       {{singleObsDetails[0].notes}}
 
       <br>
         <div style="text-align: center;">
 
-          <button ng-if="ShowSubmitButton" class="button button-positive" ng-click="submitFailedObs()" style="border-radius: 7px;width:40%;">Re-Submit</button>
-        <button ng-if="ShowSubmitButton" class="button  button-positive" ng-click="deleteObs()" style="border-radius: 7px;width:40%;margin-left: 8px;">Delete</button>
+          <button ng-if="ShowSubmitButton" class="button button-positive" ng-click="submitFailedObs()" style="border-radius: 7px;width:40%;">{{'reSubmit' | translate}}</button>
+        <button ng-if="ShowSubmitButton" class="button  button-positive" ng-click="deleteObs()" style="border-radius: 7px;width:40%;margin-left: 8px;">{{'delete' | translate}}</button>
         </div>
-         <button ng-if="!ShowSubmitButton" class="button button-full button-positive" ng-click="deleteObs()" style="border-radius: 7px;">Delete</button>
+         <button ng-if="!ShowSubmitButton" class="button button-full button-positive" ng-click="deleteObs()" style="border-radius: 7px;">{{'delete' | translate}}</button>
        <br>
          
   </ion-content> 

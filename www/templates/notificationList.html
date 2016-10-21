@@ -1,8 +1,8 @@
-<ion-view view-title="Notifications">
+<ion-view view-title="{{'notifications' | translate}}">
 <ion-nav-buttons side="right">
     <div >
    <a class="button button-clear" ng-click="sendNewNotification()" ng-if="sendNotify">
-              Send
+              {{'send' | translate}}
        </a>
     </div>
   </ion-nav-buttons>
@@ -23,10 +23,9 @@ on-infinite="loadMore()"
 distance="1%" ng-if="hasMoreData">
 </ion-infinite-scroll>
 
-
   <div id="noNotifications" style="display:none;" class="wrapper text-center">
   <ion-item>
-        <p style="text-align: center;">You dont have any Notifications</p>
+        <p style="text-align: center;"> {{'noNotification' | translate}}</p>
      </ion-item>   
     </div>
 

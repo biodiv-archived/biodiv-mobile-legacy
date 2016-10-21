@@ -1,6 +1,6 @@
 var appnService = angular.module('starter.services', [])
 
-appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup){
+appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup, $cordovaProgress){
 
 	return {
      GetUserDetails : function(data){
@@ -14,8 +14,9 @@ appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup){
                 //return result;
             }).error(function(d, status, headers, config) {
             	//$cordovaProgress.hide();
-            	$(".modal1").hide();
-                console.log(d);
+            	      $(".modal1").hide();
+
+                console.log(status);
                 showDailog($ionicPopup,"Please check your username and password");
         });
 
@@ -26,7 +27,6 @@ appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup){
     };*/
     RegisterUser : function(data){
     	$(".modal1").show();
-    	console.log(data)
     	return $http({
                 method: "POST",
                 url : ApiEndpoint.url + '/register/user',
@@ -70,12 +70,10 @@ appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup){
                 //alert(JSON.stringify(response));
                 //return result;
             }).error(function(d, status, headers, config) {
-               // $(".modal").hide();
-               //$cordovaProgress.hide();
-                $(".modal1").hide();
+                //$(".modal").hide();
+                $cordovaProgress.hide();
                 //alert("Please checkyour username and password");
-                console.log(d);
-                console.log(JSON.stringify(config));
+                console.log(config)
                 //alert("Unknown error");
         });
      },
@@ -92,12 +90,12 @@ appnService.factory('LoginService', function($http, ApiEndpoint, $ionicPopup){
                 //alert(JSON.stringify(response));
                 //return result;
             }).error(function(d, status, headers, config) {
-                ///$(".modal").hide();
-                //$cordovaProgress.hide();
-                $(".modal1").hide();
+                //$(".modal").hide();
+                $cordovaProgress.hide();
                 //alert("Please checkyour username and password");
                 console.log(config);
                 console.log("console  "+JSON.stringify(d));
+                //alert(JSON.stringify(d));
                 //alert("Unknown error");
         });
      }
@@ -111,15 +109,13 @@ appnService.factory('BrowseService', function($http,ApiEndpoint, $ionicPopup, $c
 
 	var items = [];
 	var observationDetails = [];
-		var arrayID = [];
-		var browseValue;
-		      var orderNumber;
-
+	var arrayID = [];
+	var orderNumber;
 	var tokenvar = localStorage.getItem('USER_KEY');
       var tokenvar1 = JSON.parse(tokenvar);
       var token = tokenvar1.userKey;
       var justCount = 0;
-      var appkey = "f947a3cd-1409-4a30-9ca2-4cdfcc5fd0a9";// "2b808e98-ab16-4b39-8096-c72eebd18dc0";
+      var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";//"82adf5bf-d064-4caf-9233-4f9e41866ae9";//"2b808e98-ab16-4b39-8096-c72eebd18dc0";
 	return {
 		GetBrowseInfo: function(){
 				return $http({
@@ -142,12 +138,6 @@ appnService.factory('BrowseService', function($http,ApiEndpoint, $ionicPopup, $c
 			console.log(items);
 			return items;
 		},
-		setSpeciesGroupID: function(browseID){
-			browseValue = browseID;
-		},
-		getSpeciesGroupID: function(){
-			return browseValue;
-		},
 		GetBrowseList: function(data){
 			//justCount++;
 			console.log(data);
@@ -166,8 +156,7 @@ appnService.factory('BrowseService', function($http,ApiEndpoint, $ionicPopup, $c
 					//return items;
 			    }).error(function(data, status, headers, config) {
 			    	//$cordovaProgress.hide();
-			    	console.log(JSON.stringify(data));
-			    	console.log(config);
+			    	console.log(data);
 							console.log("Auth.signin.error!")
 			        		
 			    });
@@ -281,8 +270,8 @@ appnService.factory('BrowseService', function($http,ApiEndpoint, $ionicPopup, $c
 					 //console.log(items);
 					//return items;
 			    }).error(function(data, status, headers, config) {
-			    	showDailog($ionicPopup,"Please check your internet connection and try after sometime");
-			    	console.log(JSON.stringify(data));
+			    	showDailog($ionicPopup,"Please check your internet connection and try after some sometime");
+			    	console.log(data);
 							console.log("Auth.signin.error!")
 			        		
 			    });
@@ -395,7 +384,6 @@ appnService.factory('BrowseService', function($http,ApiEndpoint, $ionicPopup, $c
 			return orderNumber;
 		}
 
-
 	};
 });
 
@@ -404,45 +392,38 @@ appnService.factory('LocationService', function($q){
 	var currentLocation = {
 		//latitude:"11.93707847595214",
 		//longitude:"79.83552551269528"
-		latitude:"",
-		longitude:""
+		latitude : "",
+		longitude : ""
 	}
 
 	var userSelectLoc = {
-		latitude:"",
-		longitude:""
+		//latitude:"11.93707847595214",
+		//longitude:"79.83552551269528"
+		latitude : "",
+		longitude : ""
 	}
 
 	var detailedAdd = '';
-	var curntAdd = "";
+		var curntAdd = "";
 
 
 	return {
 		/*GetLocation : function(){
 				var d = $q.defer();
 				//console.log(d);
-				alert('came');
 			navigator.geolocation.getCurrentPosition(function (pos) {
             currentLocation.latitude = pos.coords.latitude;
             currentLocation.longitude = pos.coords.longitude;
             d.resolve(currentLocation);
-        },function(err){
-
-        	alert("err"+JSON.stringify(err));
-        }, {
-                    enableHighAccuracy: true,
-                    timeout: 30000,
-                    maximumAge: 10000
-                });
+        });
         return d.promise
 	},*/
 	setCurrentLocation: function(laat, loong){
-		 currentLocation.latitude = laat;
-		 currentLocation.longitude = loong;
-		 //alert(laat+" "+loong);
+		currentLocation.latitude = laat;
+		currentLocation.longitude = loong;
+	//alert(laat+" "+loong);
 	},
 	getCurrentLocation: function(){
-		//alert(JSON.stringify(currentLocation));
 		return currentLocation;
 	},
 	SetUserSelectedLocation: function(data){
@@ -537,7 +518,7 @@ appnService.factory('NotificationService', function($http,ApiEndpoint){
 		},
 		SaveTokens: function(tokenVal){
 				return $http({
-					method : "POST",
+					method : "GET",
 					url : ApiEndpoint.url + '/pushNotification/pushTokensave',
 					headers : {
 						//"X-Auth-Token":token
@@ -550,6 +531,8 @@ appnService.factory('NotificationService', function($http,ApiEndpoint){
 					//return items;
 			    }).error(function(data, status, headers, config) {
 			    	  $(".modal1").hide();
+
+							//alert(JSON.stringify(data));
 			        		
 			    });
 		},
@@ -578,6 +561,7 @@ appnService.factory('NotificationService', function($http,ApiEndpoint){
 	};
 });
 
+
 appnService.factory('UserGroupService', function($http,ApiEndpoint,$cordovaProgress){
 
 	var tokenvar = localStorage.getItem('USER_KEY');
@@ -585,7 +569,7 @@ appnService.factory('UserGroupService', function($http,ApiEndpoint,$cordovaProgr
       var token = tokenvar1.userKey;
       //alert(token);
       var userId = tokenvar1.userID;
-      var appkey = "f947a3cd-1409-4a30-9ca2-4cdfcc5fd0a9";
+      var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";
       //alert(userId);
       var userGroups;
       var groupList;
@@ -599,15 +583,13 @@ appnService.factory('UserGroupService', function($http,ApiEndpoint,$cordovaProgr
 						"X-Auth-Token":token
 					},
 					params : data,
-					//param : {"max":50,"format":"json"}
 				}).success(function(data) {
 					console.log("Auth.signin.success!")
 				
 					 //console.log(data);
 					//return items;
 			    }).error(function(data, status, headers, config) {
-			    	//$cordovaProgress.hide();
-			    	$(".modal1").hide();
+			    	$cordovaProgress.hide() ;
 							console.log("Auth.signin.error!")
 			        		
 			    });
@@ -650,20 +632,16 @@ appnService.factory('UserGroupService', function($http,ApiEndpoint,$cordovaProgr
 			    });
 		},
 		PostToGroup: function(param){
-			console.log(param);
+			console.log();
 			return $http({
 					method : "GET",
 					url : ApiEndpoint.url + '/userGroup/bulkPost',
-					headers : {
-						"X-Auth-Token":token,
-						"X-AppKey":appkey
-					},
 					params : param,
 					//params : {"id":id}
 				}).success(function(data) {
 					console.log("joining success!")
 				
-					 console.log(data);
+					 //console.log(data);
 					//return items;
 			    }).error(function(data, status, headers, config) {
 							console.log("joining error!")
@@ -698,14 +676,13 @@ appnService.factory('NewObservationService', function($http,ApiEndpoint, $ionicP
 	  var token = tokenvar1.userKey;
 	  var userId = tokenvar1.userID;
 	  //var id = tokenvar1.nId;
-	  var appkey = "f947a3cd-1409-4a30-9ca2-4cdfcc5fd0a9";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
+	  var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
 	  var statusDetails = [];
 	  var obsDetailVals = [];
 	 
 
 	  return {
 	  	SubmitObservation: function(paramsData){
-	  		//alert('got reached');
 				return $http({
 					method : "POST",
 					url : ApiEndpoint.url + '/observation/save',
@@ -716,18 +693,14 @@ appnService.factory('NewObservationService', function($http,ApiEndpoint, $ionicP
 					params : paramsData
 				}).success(function(data) {
 					console.log("Obs submitted!")
-				//alert('submited1');
+				
 					 //console.log(data);
 					//return items;
-			    }).error(function(data, status, headers, config, statusText) {
-			    	//showDailog($ionicPopup,"Unknown error while submiting observation, Please try again later");
-							alert("Service error");
-							
-							//alert('submited');
-							console.log("headers"+headers);
+			    }).error(function(data, status, headers, config) {
+			    			//showDailog($ionicPopup,"Unknown error while submiting Observation, Please try again")
+							console.log("submission error");
 							console.log("data"+data);
-							alert(data);
-							alert(status);
+							console.log("headers"+headers);
 							console.log("config"+config);
 							//SetStatus("FAILURE");
 			        		
@@ -791,9 +764,9 @@ appnService.factory('NewObservationService', function($http,ApiEndpoint, $ionicP
 					 //console.log(data);
 					//return items;
 			    }).error(function(data, status, headers, config) {
-			    	//showDailog($ionicPopup,"Unknown error while Deleting observation, Please try again later");
+			    		    //showDailog($ionicPopup,"Unknown error while deleting Observation, Please try again")
 							console.log("submission error");
-							console.log("data"+JSON.stringify(data));
+							console.log("data"+data);
 							console.log("headers"+headers);
 							console.log("config"+config);
 							//SetStatus("FAILURE");
@@ -818,8 +791,8 @@ appnService.factory('NewObservationService', function($http,ApiEndpoint, $ionicP
 					 //console.log(data);
 					//return items;
 			    }).error(function(data, status, headers, config) {
+			    	//showDailog($ionicPopup,"Unknown error while editing Observation, Please try again")
 			    	//alert("edit error");
-			    	//showDailog($ionicPopup,"Unknown error while editing observation, Please try again later");
 							console.log("submission error");
 							console.log("data"+data);
 							console.log("headers"+headers);

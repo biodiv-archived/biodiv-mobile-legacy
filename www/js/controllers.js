@@ -1,6 +1,6 @@
 var appne = angular.module('starter.controllers', [])
 
-appne.controller('AppCtrl', function($scope, $location,$state,$ionicModal, $ionicSideMenuDelegate, $timeout,LoginService,$ionicPopup,$cordovaToast, $cordovaOauth, ApiEndpoint, $http) {
+appne.controller('AppCtrl', function($scope, $translate, $location,$ionicUser,$rootScope,$ionicPush,$cordovaPush,$rootScope,$state,$ionicModal, $ionicSideMenuDelegate, $timeout,LoginService,$ionicPopup,$cordovaToast, $cordovaOauth, ApiEndpoint, $http, $filter) {
   
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -12,17 +12,19 @@ appne.controller('AppCtrl', function($scope, $location,$state,$ionicModal, $ioni
   //localStorage.removeItem('USER_KEY');
   //alert($location.absUrl());
   $ionicSideMenuDelegate.canDragContent(false);
-  //if(localStorage.getItem('USER_KEY')!== null){
-    //alert(Icheck());
-   // $state.go("app.home",{},{cache:false});
- // }
-  if(localStorage.getItem('SETTINGS') == null){
-      //alert(Icheck());
-      var setVar = {"wifiSetting":false,"manualUpload":false};
-         localStorage.setItem('SETTINGS',JSON.stringify(setVar));
-    }
+  
 
-    
+  if(localStorage.getItem('SETTINGS') == null){
+    //alert(Icheck());
+    var setVar = {"wifiSetting":false,"manualUpload":false};
+       localStorage.setItem('SETTINGS',JSON.stringify(setVar));
+  }
+
+  if(localStorage.getItem('LangSETTINGS') == null){
+      //alert(Icheck());
+      var langVar = {"languageSetting":false};
+         localStorage.setItem('LangSETTINGS',JSON.stringify(langVar));
+    }
 
   // Form data for the login modal
   $scope.loginData = {};
@@ -38,43 +40,58 @@ appne.controller('AppCtrl', function($scope, $location,$state,$ionicModal, $ioni
   /*$scope.closeLogin = function() {
     $scope.modal.hide();
   };*/
+  if(localStorage.getItem('LangSETTINGS') != null){
+
+      var settingLang = localStorage.getItem('LangSETTINGS');
+      var langValues = JSON.parse(settingLang);
+      var languageChange = langValues.languageSetting;
+      if(languageChange){
+        $translate.use('fr').then(function(data) {
+            //alert(data);
+              console.log("SUCCESS -> " + data);
+          }, function(error) {
+              console.log("ERROR -> " + error);
+          });
+      }else {
+        $translate.use('en').then(function(data) {
+            //alert(data);
+              console.log("SUCCESS -> " + data);
+          }, function(error) {
+              console.log("ERROR -> " + error);
+          });
+      }
+    }
 
   // Open the login modal
   
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
-   
-   
 
-    var check =internetCheck($ionicPopup);
+    
+    
+    var check =internetCheck($ionicPopup, $filter);
     if(check == false){
       return;
     } else {
-
+      //$cordovaProgress.showSimple(true) ;
+      $(".modal1").show();
     /*var check = {"check1":"hi"}
     localStorage.setItem("checking",JSON.stringify(check));*/
     //console.log('Doing login', $scope.loginData);
     //localStorage.removeItem('USER_KEY');
-     //$cordovaProgress.showSimple(true); 
-               $(".modal1").show();
-              var role = "";
     LoginService.GetUserDetails($scope.loginData).then(function(vals){
 
       console.log('Doing login', vals);
-      if(vals["data"]['model']['roles'][0]=="ROLE_ADMIN"){
-          role = "ROLE_ADMIN"
-      }
 
-      var uservar = {"userKey":vals["data"]['model']['token'],"userID":vals["data"]['model']['id'],"nId":0,"Role":role};
+      var uservar = {"userKey":vals["data"]['model']['token'],"userID":vals["data"]['model']['id'],"nId":0};
        localStorage.setItem('USER_KEY',JSON.stringify(uservar));
-       //$cordovaProgress.hide();
        if(localStorage.getItem('Home') == null){
-      //alert(Icheck());
-        var homeValue = {"ExecuteVal":0};
-           localStorage.setItem('Home',JSON.stringify(homeValue));
-      }
-                 $(".modal1").hide();
-
+     //alert(Icheck());
+          var homeValue = {"ExecuteVal":0};
+          localStorage.setItem('Home',JSON.stringify(homeValue));
+        }
+        //$cordovaProgress.hide();
+        $(".modal1").hide();
         $state.go("app.home");
       /*var laboo = localStorage.getItem('checking');
       var taboo = JSON.parse(laboo);
@@ -107,90 +124,91 @@ appne.controller('AppCtrl', function($scope, $location,$state,$ionicModal, $ioni
     //$(".modal").show();
     //667301081944-v71rladv4mlt3ockv2rjomtfs4rckebp.apps.googleusercontent.com
     //29806730219-b6l9ofjup5f1luupdjngtv7ir8r8vlrv.apps.googleusercontent.com
-        $cordovaOauth.google("317806372709-lj7r2mfrkgihhqnodmelugtqga3m4vb4.apps.googleusercontent.com", ["email"]).then(function(result) {
+        $cordovaOauth.google("833560718216-lgm8g7ecsksm8p0e8g6ucpmvd31k3fbv.apps.googleusercontent.com", ["email"]).then(function(result) {
             console.log(JSON.stringify(result));
             //var res = JSON.stringify(result);
             var access_token = result.access_token;
             //alert(access_token);
         google(access_token);
-    }, function (error) {
+    },function(error) {
       alert(JSON.stringify(error));
-            console.log("The toast was not shown due to " + error);
-        });
+    });
   }
 
   function facebook(accessKey){
     //alert("accessKey" + accessKey);
     //$(".modal").hide();
-    //$cordovaProgress.showSimple(true); 
-    var role="";
+    //$cordovaProgress.showSimple(true) ;
+    $(".modal1").show();
     LoginService.FacebookUserlogin(accessKey).then(function(res){
      // alert("in to success");
           console.log(res);
           //alert(JSON.stringify(res));
           var gToken = res.data.model.token ;
           //alert(gToken);
-          if(res["data"]['model']['roles'][0]=="ROLE_ADMIN"){
-            role = "ROLE_ADMIN"
-          }
-
-          var uservar = {"userKey":res["data"]['model']['token'],"userID":res["data"]['model']['id'],"nId":0,"Role":role};
+          var uservar = {"userKey":res["data"]['model']['token'],"userID":res["data"]['model']['id'],"nId":0};
           localStorage.setItem('USER_KEY',JSON.stringify(uservar));
           //$cordovaProgress.hide();
+          $(".modal1").hide();
           $state.go("app.home");
        });
   }
 
   function google(accesVal){
     //alert("came");
+    //$(".modal").hide();
+    //$cordovaProgress.showSimple(true) ;
     $(".modal1").show();
-    //$cordovaProgress.showSimple(true); 
-    var role = "";
     LoginService.GoogleUserlogin(accesVal).then(function(res){
       //alert("in to success");
-          console.log(JSON.stringify(res));
+          console.log(res);
           //alert(JSON.stringify(res));
           var gToken = res.data.model.token ;
           //alert(gToken);
-          if(res["data"]['model']['roles'][0]=="ROLE_ADMIN"){
-            role = "ROLE_ADMIN"
-          }
-
-          var uservar = {"userKey":res["data"]['model']['token'],"userID":res["data"]['model']['id'],"nId":0,"Role":role};
+          var uservar = {"userKey":res["data"]['model']['token'],"userID":res["data"]['model']['id'],"nId":0};
           localStorage.setItem('USER_KEY',JSON.stringify(uservar));
           if(localStorage.getItem('Home') == null){
-            //alert(Icheck());
+     //alert(Icheck());
           var homeValue = {"ExecuteVal":0};
-             localStorage.setItem('Home',JSON.stringify(homeValue));
+          localStorage.setItem('Home',JSON.stringify(homeValue));
         }
-    $(".modal1").hide();
-          $state.go("app.home");
+          //$cordovaProgress.hide();
+          $(".modal1").hide();
+          $state.go("app.home",{},{cache:false});
        });
   }
 
   $scope.forgotPassword = function() {
     $ionicPopup.prompt({
-    title: 'Forgot Password ?:',
-    subTitle: 'Password will be sent to this email id',
-    inputType: 'text',
-    inputPlaceholder: 'Email'
+      title: $filter('translate')('forgotPassword'),//'Forgot Password ?:',
+      subTitle: $filter('translate')('passwordSent'),//'Password will be sent to this email id',
+      inputType: 'text',
+      inputPlaceholder: $filter('translate')('email')
   }).then(function(email) {
    //console.log('Your password is', res);
    if(!validateEmail(email)){
         //alert("Invalid email");
-       showToast($cordovaToast,"Please enter a valid Email")
+       showToast($cordovaToast,$filter('translate')('enterEmail'))
         return ;
       }
  LoginService.ForgotPassword(email).then(function(res){
 
           console.log(res);
-          $(".modal").hide();
+          //$(".modal").hide();
           showToast($cordovaToast,res.data.msg);
        });
 
  });
     
   }
+
+  function showDailog(message){
+
+      $ionicPopup.alert({
+          title: 'ERROR',
+          content: message//'You must submit atleast one image'
+        });
+    }
 })
 
 
@@ -203,31 +221,7 @@ function showToast($cordovaToast,message) {
         //else $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
     }
 
-appne.controller('NewUserCtrl', function($scope,LoginService,$timeout,$cordovaToast,$state,LocationService,$ionicPopup,$cordovaGeolocation){
-
-/*cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
-                  //alert(enabled);
-            if(enabled){
-                 onGPS($cordovaGeolocation,LocationService,$ionicPopup);
-
-              } else {
-
-              var settingName = "location_source";
-            
-          var confirmPopup = $ionicPopup.alert({
-                  title: 'GPS',
-                  template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
-                });
-                 confirmPopup.then(function(result) {
-
-                             cordova.plugins.settings.openSetting(settingName, success,failure);
-                  });
-
-            }
-
-        }, function(error){
-           // alert("The following error occurred: "+error);
-        });*/ 
+appne.controller('NewUserCtrl', function($scope,LoginService,$timeout,$cordovaToast,$state,LocationService,$ionicPopup,$cordovaGeolocation,$filter){
 
   $scope.register = {
     name:"",
@@ -306,16 +300,15 @@ function validateEmail(email) {
 }
 
 
-appne.controller('LogoutController', function($scope, $state, $window, $ionicPopup, $cordovaSQLite,$ionicHistory,BrowseService) {
+appne.controller('LogoutController', function($scope, $state, $window, $ionicPopup, $cordovaSQLite,$ionicHistory) {
 
 //alert("hello");
-      $scope.speciesGroups = [{"id":829,"name":"All"},{"id":841,"name":"Mammals"},{"id":837,"name":"Birds"},{"id":845,"name":"Fish"},{"id":835,"name":"Amphibians"},{"id":843,"name":"Reptiles"},{"id":856,"name":"Molluscs"},{"id":839,"name":"Arthropods"},{"id":833,"name":"Plants"},{"id":831,"name":"Fungi"},{"id":830,"name":"Others"}];
-
    $scope.logout = function(){
         console.log("logout");
         //internetCheck($ionicPopup);
         localStorage.removeItem('USER_KEY');
         localStorage.removeItem('Home');
+
         localStorage.removeItem('UserGroupArray');
          $state.go("login");
          //$window.location.reload(true)
@@ -330,195 +323,95 @@ appne.controller('LogoutController', function($scope, $state, $window, $ionicPop
           });*/
       } 
 
-     $scope.goToNewObs = function(){
-         cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
-                  //alert(enabled);
-            if(enabled){
-                $ionicHistory.clearCache().then(function(){ 
-                  $state.go('app.newObservation',{},{ reload: true });
-                })  
-              } else {
-
-              var settingName = "location_source";
-            
-          var confirmPopup = $ionicPopup.alert({
-                  title: 'GPS',
-                  template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
-                });
-                 confirmPopup.then(function(result) {
-
-                             cordova.plugins.settings.openSetting(settingName, success,failure);
-                  });
-
-            }
-
-        }, function(error){
-            alert("The following error occurred: "+error);
-        }); 
+      $scope.goToNewObs = function(){
+        $ionicHistory.clearCache().then(function(){ 
+          $state.go('app.newObservation',{},{ reload: true });
+        })
       }
         $scope.goToObsNearby = function(){
-          cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
-              //alert(enabled);
-                if(enabled ){
-                    $scope.listPopup = $ionicPopup.show({
-                             template: '<ion-list class="item-icon-right">                                '+
-                                       '  <ion-item class="item " id="uGroup{{usrgrps.id}}" ng-repeat="usrgrps in speciesGroups " ng-click="goToNearBy({{usrgrps.id}});" > '+
-                                       '    {{usrgrps.name}}                             '+
-                                       '  </ion-item>                             '+
-                                       '</ion-list>                               ',
-                             title: 'Observation Near me',
-                             scope: $scope,
-                             buttons: [
-                               { text: 'Cancel' },
-                             ]
-                           });     
-                  } else {
-
-                  var settingName = "location_source";
-                
-              var confirmPopup = $ionicPopup.alert({
-                      title: 'GPS',
-                      template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
-                    });
-                     confirmPopup.then(function(result) {
-
-                                 cordova.plugins.settings.openSetting(settingName, success,failure);
-                      });
-
-                }
-
-            }, function(error){
-                //alert("The following error occurred: "+error);
-            });
-
-            
-
-      }
-      $scope.goToNearBy = function(browseId){
-        $scope.listPopup.close();
-              BrowseService.setSpeciesGroupID(browseId);
-
-        $ionicHistory.clearCache().then(function(){ 
-            $state.go('app.observationnearby',{},{ reload: true });
+          console.log("cm");
+          $ionicHistory.clearCache().then(function(){ 
+            $state.go('app.observationnearby');
           })
         
+         /*var tokenVal = localStorage.getItem('USER_KEY');
+      var tokenVar = JSON.parse(tokenVal);
+      var countVal = tokenVar.nId;
+        if(countVal==0){
+          tokenVar.nId = 1;
+          localStorage.setItem('USER_KEY',JSON.stringify(tokenVar));
+          $state.go("app.newObservation");
+        }else{
+      
+          $state.go("app.newObservation",null,{reload:true});
+        }*/
+        //return false;
       }
       $scope.goToMyCollection = function(){
         $ionicHistory.clearCache().then(function(){ 
           $state.go('app.mycollection');
         })
       }
-       
 
-        $scope.goToBrowseObs = function(){
-           $scope.listPopup = $ionicPopup.show({
-         template: '<ion-list class="item-icon-right">                                '+
-                   '  <ion-item class="item " id="uGroup{{usrgrps.id}}" ng-repeat="usrgrps in speciesGroups " ng-click="browseObs({{usrgrps.id}});" > '+
-                   '    {{usrgrps.name}}                             '+
-                   '  </ion-item>                             '+
-                   '</ion-list>                               ',
-         title: 'Select Groups',
-         scope: $scope,
-         buttons: [
-           { text: 'Cancel' },
-         ]
-       });  
-
-      }
-
-      $scope.browseObs = function(IdValue){
-       $scope.listPopup.close();
-      BrowseService.setSpeciesGroupID(IdValue);
+      $scope.goToBrowseObs = function(){
         $ionicHistory.clearCache().then(function(){ 
-          $state.go('app.browse',{},{ reload: true });
+          $state.go('app.browse',{},{reload:true});
         })
       }
+      $scope.goToHome = function(){
+        $ionicHistory.clearCache().then(function(){ 
+            $state.go('app.home');
+          })
+      }
+
      
 });
-
-appne.controller('SettingsController', function($scope, $state, LocationService) {
-
-  //alert("hi");
-  var setStorage = localStorage.getItem('SETTINGS');
-      var setValues = JSON.parse(setStorage);
-      var wifiSettings = setValues.wifiSetting;
-      //alert(token);
-      var manualUploads = setValues.manualUpload;
-      //alert(wifiSettings +", "+manualUploads);
-  $scope.settingsList = [
-    { text: "Upload over WIFI", subtext: "Use only WIFI to upload observations in queue", checked: wifiSettings },
-    { text: "Upload Manually", subtext: "Prevents automated uploading of observations from the queue" , checked: manualUploads }
-  ];
-  
-  $scope.setChange = function(){
-    //alert($scope.settingsList[0].checked);
-    //alert($scope.settingsList[1].checked);
-    setValues.wifiSetting = $scope.settingsList[0].checked ;
-    setValues.manualUpload = $scope.settingsList[1].checked ;
-    localStorage.setItem('SETTINGS',JSON.stringify(setValues));
-  }
-  });
-
-appne.controller('aboutController', function($scope,$location,$ionicSideMenuDelegate){
-        var obsId = $location.path().split("/")[3];
-        if(obsId == 2){
-          $scope.showMenu = false;
-          $ionicSideMenuDelegate.canDragContent(false);
-        }else {
-          $scope.showMenu = true;
-        }
-
-});
-
-
 //appne.controller('observationStatusController', function($scope, NewObservationService, $cordovaSQLite){
-
-  //alert(localStorage.getItem('StatusArray'));
-
-  function observationStatusController($scope, NewObservationService, $cordovaSQLite){
+  function observationStatusController($scope, NewObservationService, $cordovaSQLite, $filter){
   var setStorage = localStorage.getItem('SETTINGS');
      var setValues = JSON.parse(setStorage);
      $scope.pendingObservation = setValues.manualUpload;
      $scope.details = [];
      $scope.obsStatusList = false;
-      $scope.obsStatusFailedList = false;
-      $('.footerBar').hide();
+     $scope.obsStatusFailedList = false;
      var query = "SELECT * from observation ";
-    
+     var statusValue;
 
     $cordovaSQLite.execute(db, query).then(function(res) {
       if(res.rows.length == 0){
        // $("div #obsStatusMsg").show();
        $scope.obsStatusList = false;
-
-       $('.footerBar').hide();
       }else{
-         $('.footerBar').show();
         for(var i=0;i<res.rows.length;i++){
           var dat = JSON.parse(res.rows.item(i)['obslist']);
-                  var iCheck = Icheck();
+          var iCheck = Icheck();
                   if(iCheck==true && dat.hasOwnProperty('file_name')){
                     $scope.deleteMultiple(res.rows.item(i)['id'],dat['file_name'] );
                   }
 
           console.log(dat);
-          if(res.rows.item(i)['status'] == "No Location"){
-              $scope.obsStatusList = true;
+           if(res.rows.item(i)['status'] == "No Location"){
+            $scope.obsStatusList = true;
+            statusValue = $filter('translate')('subNoLocation')
+            $scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":statusValue, "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":true });
 
-            $scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":res.rows.item(i)['status'], "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":true });
 
           }else {
-            if(res.rows.item(i)['status'] == "PENDING" || res.rows.item(i)['status'] == "PROCESSING"){
+            if(res.rows.item(i)['status'] == "PENDING"){
+              $scope.obsStatusList = true;
+              statusValue = $filter('translate')('subPending')
+            } 
+            if(res.rows.item(i)['status'] == "PROCESSING"){
+              
                $scope.obsStatusList = true;
-               $scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":res.rows.item(i)['status'], "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":false });
+               statusValue = $filter('translate')('subProcessing')
 
             }
             if(res.rows.item(i)['status'] == "FAILED"){
               $scope.obsStatusFailedList = true;
-              $scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":res.rows.item(i)['status'], "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":false });
-
+              statusValue = $filter('translate')('subFailed')
             }
-            //$scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":res.rows.item(i)['status'], "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":false });
+            $scope.details.push({"id":res.rows.item(i)['id'], "sciName":dat['recoName'],"status":statusValue, "imgArr":dat['imagePath'], "date":dat['fromDate'], "location":dat['placeName'], "notes":dat['notes'], "showGPS":false });
           }
         }
         //$("div #obsStatusList").show();
@@ -531,8 +424,24 @@ appne.controller('aboutController', function($scope,$location,$ionicSideMenuDele
         console.error(err);
     });
   }
-  
-appne.controller('statusDetailsController', function($state,$scope,$location,NewObservationService,$cordovaSQLite, $ionicPopup) {
+  /*if(localStorage.getItem('StatusArray')== null){
+
+        
+
+  }else {
+    //$route.reload();
+    //alert("statuscntrl");
+      var status = localStorage.getItem('StatusArray');
+      var statusArray1 = JSON.parse(status);
+
+      console.log(statusArray1);
+      $scope.details = statusArray1;
+      
+      $("div #obsStatusList").show();
+
+  }*/
+//});
+appne.controller('statusDetailsController', function($state,$scope,$location,NewObservationService,$cordovaSQLite,$ionicPopup, $filter) {
   
   console.log("statusDetailsController");
 
@@ -557,11 +466,7 @@ appne.controller('statusDetailsController', function($state,$scope,$location,New
           }
         } 
       }
- $scope.goStatus = function(){
-       $state.go('app.observationStatus');
 
-  }
-   
       $scope.submitFailedObs = function(){
         var query = "UPDATE OBSERVATION SET STATUS='PENDING' WHERE ID ="+obsId;
       $cordovaSQLite.execute(db, query).then(function(res) {
@@ -573,10 +478,15 @@ appne.controller('statusDetailsController', function($state,$scope,$location,New
         console.error(err);
       });
       }
-       $scope.deleteObs = function(){
+      $scope.goStatus = function(){
+       $state.go('app.observationStatus');
+
+      }
+
+      $scope.deleteObs = function(){
          var confirmPopup = $ionicPopup.confirm({
-           title: 'Delete Observation',
-           template: 'This Observation will be deleted permanently. Are you sure ? '
+           title: $filter('translate')('deleteObs'),
+           template: $filter('translate')('obsDeleted')
          });
          confirmPopup.then(function(result) {
            if(result) {
@@ -594,8 +504,6 @@ appne.controller('statusDetailsController', function($state,$scope,$location,New
 
 
       }
-
-
 //alert($scope.singleImgDetails[0]["image"]);
 //console.log($scope.singleImgDetails[0]["image"]["icon"]);
 //console.log(obsId);
@@ -604,18 +512,17 @@ appne.controller('statusDetailsController', function($state,$scope,$location,New
   
     //console.log(imgDetails);
 });
-appne.controller('BrowseDetailsCtrl', function($scope,$state,ApiEndpoint, $http, $window,$filter,$cordovaInAppBrowser,$ionicModal,$location,BrowseService,NewObservationService,LocationService,$ionicPopup,UserGroupService,$cordovaToast,$ionicSideMenuDelegate,$ionicHistory) {
+
+appne.controller('BrowseDetailsCtrl', function($scope,$state,ApiEndpoint, $http, $window,$ionicModal,$filter,$cordovaInAppBrowser,$location,BrowseService,NewObservationService,LocationService,$ionicPopup,UserGroupService,$cordovaToast,$ionicSideMenuDelegate,$ionicHistory) {
   $scope.vedio = false;
   $scope.showButton = true;
     //$scope.agreeButton = false;
     //$scope.acceptedName = true;
     $scope.showMore = false;
     $ionicSideMenuDelegate.canDragContent(false);
-
   var tokenvar = localStorage.getItem('USER_KEY');
   var tokenvar1 = JSON.parse(tokenvar);
   var userId = tokenvar1.userID;
-
   $scope.userValue = tokenvar1.userID;
   //alert($scope.userValue);
   console.log("BrowseDetailsCtrl");
@@ -627,10 +534,10 @@ appne.controller('BrowseDetailsCtrl', function($scope,$state,ApiEndpoint, $http,
     commonName:'',
     comment:'',
     recoId:'',
-    lang:'English'
+    lang:'Anglais / English'
   };
   $scope.languages = [];
-    $scope.languages.push("Abor","Bangla","Afghan","Arab","Assam","Assamese","Awadhi","Baduga and Kurumba","Baluchi","Bauris of Deccan","Beng","Bengali","Benhali","Bhagalpore hill tribes","Bhagulpore hill tiibes","Bhojpuri","Bihari","Bihari languages","Blue English","Braj","Brngali","Bundelkand","Burm","Burmese","cabbage white","Cach","Cach.","Cachar","Chin","Cingalese","Coorg","Coorgi","Daff","Deccan","Dogri","Dravidian languages","Duff","Dur","Dutch","English","EnglishHindi","English/hindi","EnglisHindih","Garh","Garo","Gond","Gondi","Gonds","Guinea-Bissau","Gujarat","Gujarati","Hi","Hill-tribes near Simla","Hima","Himachali languages; Western Pahari languages","Hin","Hind","Hindi","Hindi,Bengali","Hindi/ English","Hindihi","Ho","Hyderabad","Igilwat","Indian Languages","Indic Languages","Iran","Irula","Kach","Kachchi","Kannada","Kash","Kashmiri","Kashi","kiraalbogi","Konkani","Kuki","Kutchi","Ladak","Ladh","Ladk","Lakh","Lepcha","Lush","Ma");
+  $scope.languages.push("Anglais / English","Comores","Bangla","Créole Guyane","Créole Maurice","Créole Réunion","Creoles and pidgins, French-based","Créole Seychelles","Français / French","Malgache","Ndebele","Pedi","Siswati","Sotho","Swazi","Taki-taki");
 $scope.editButton = function(){
   LocationService.SetUserSelectedLocAdd('');
 }
@@ -638,15 +545,15 @@ $scope.editButton = function(){
 var obsId = $location.path().split("/")[3];
 
 $scope.openUser = function(userId){
-  $window.open('http://indiabiodiversity.org/user/show/'+userId, '_system');
+  //$window.open('http://indiabiodiversity.org/user/show/'+userId, '_system');
 
-/*$cordovaInAppBrowser.open('http://portal.wikwio.org/user/show/'+userId, '_blank')
+$cordovaInAppBrowser.open('http://portal.wikwio.org/user/show/'+userId, '_blank')
       .then(function(event) {
         // success
       })
       .catch(function(event) {
         // error
-      });*/
+      });
 }
 //console.log(typeof(newUrl.split("/")[3]));
 //console.log(obsId);
@@ -674,7 +581,7 @@ $scope.commentList = [];
 
       console.log(time);
       $scope.serverTime = time;
-      var z='';
+        var z='';
        BrowseService.GetActivityFeed(obsId,z).then(function(feedList){
         $scope.showMore = true;
           console.log(feedList);
@@ -722,7 +629,7 @@ $scope.commentList = [];
 $scope.paramsList ={};
   $scope.postComments = function(){
     if($scope.comment.text == ''){
-      showIonicAlert($ionicPopup,'Please enter a comment');
+      showIonicAlert($ionicPopup,$filter('translate')('enterCom'), $filter);
     } else{
       $scope.paramsList['rootHolderId'] = obsId ;
       $scope.paramsList['rootHolderType'] = "species.participation.Observation" ;
@@ -735,7 +642,7 @@ $scope.paramsList ={};
         if(res.data.success == true){
           $scope.commentList.push({"userIcon":"","userId":"","userName":"you","activityAction":"","activityName":$scope.comment.text,"date":"now","fullDate":""});
           $scope.comment.text ='';
-          showToast($cordovaToast,"successfully added, please visit the page again to see updated details");
+          showToast($cordovaToast,$filter('translate')('addedComment'));
 
         }
       });
@@ -832,11 +739,14 @@ $scope.paramsList ={};
     $scope.editDiv = true;
     $scope.edit.editText = comment;
           for(var i=0;i< $scope.commentList.length ;i++){
+            //$scope.commentList[i]['commentFlag'] = false;
             if($scope.commentList[i]['activityAction']=='' && $scope.commentList[i]['commentId'] ==id){
               $scope.commentList[i]['commentFlag'] = true;
               //alert($scope.commentList[i]['commentFlag']);
+              console.log($scope.commentList);
               //break;
-            } else {
+            }else {
+              //alert("came");
               $scope.commentList[i]['commentFlag'] = false;
             }
           }
@@ -845,9 +755,9 @@ $scope.paramsList ={};
     //alert(id);
     $scope.editDiv = false;
     if($scope.edit.editText == '' ){
-      showIonicAlert($ionicPopup,'Please enter a comment');
+      showIonicAlert($ionicPopup,$filter('translate')('enterCom'), $filter);
     } else if($scope.edit.editText == comment){
-      showIonicAlert($ionicPopup,'comment not changed');
+      showIonicAlert($ionicPopup,$filter('translate')('noChange'), $filter);
     } else {
         $scope.paramsList['commentBody'] = $scope.edit.editText ;
         $scope.paramsList['commentId'] = id ;
@@ -856,21 +766,23 @@ $scope.paramsList ={};
         if(res.data.success == true){
           //$scope.commentList.push({"userIcon":"","userId":"","userName":"you","activityAction":"","activityName":$scope.reply.replyText,"date":"now","fullDate":""});
           $scope.edit.editText ='';
-          showToast($cordovaToast,"successfully Updated, please visit the page again to see updated details");
+          showToast($cordovaToast,$filter('translate')('updatedComment'));
 
         }
       });
     }
    }
    $scope.deleteComment = function(id){
+    //alert(id);
+
     var confirmPopup = $ionicPopup.confirm({
-           title: 'Delete Comment',
-           template: 'This comment will be deleted. Are you sure ? '
+           title: $filter('translate')('delComment'),
+           template: $filter('translate')('commentDel')
          });
          confirmPopup.then(function(result) {
            if(result) {
 
-             $scope.editDiv = false;
+            $scope.editDiv = false;
             BrowseService.DeleteComment(id).then(function(res){
             console.log(res);
             if(res.data.success == true){
@@ -879,14 +791,14 @@ $scope.paramsList ={};
                   $scope.commentList.splice(i,1);
                   break;
                 }
-              } 
+              }
               //$scope.commentList.push({"userIcon":"","userId":"","userName":"you","activityAction":"","activityName":$scope.reply.replyText,"date":"now","fullDate":""});
-             
+              
               //showToast($cordovaToast,"successfully deleted, please visit the page again to see updated details");
 
-            } else{
-                showToast($cordovaToast,"Comment deleted");
-              }
+            } else {
+                showToast($cordovaToast,$filter('translate')('commentDeleted'));
+            }
           });
 
            } else {
@@ -901,11 +813,11 @@ $scope.paramsList ={};
     $scope.editDiv = false;
     $scope.replyDiv = true;
           for(var i=0;i< $scope.commentList.length ;i++){
-            if($scope.commentList[i]['activityAction']==''&& $scope.commentList[i]['commentId'] ==id){
+            if($scope.commentList[i]['activityAction']=='' && $scope.commentList[i]['commentId'] ==id){
               $scope.commentList[i]['commentFlag'] = true;
               //alert($scope.commentList[i]['commentFlag']);
               //break;
-            } else {
+            }else {
               $scope.commentList[i]['commentFlag'] = false;
             }
           }
@@ -921,7 +833,7 @@ $scope.paramsList ={};
     //alert($scope.reply.replyText)
     //alert(id);
     if($scope.reply.replyText == ''){
-      showIonicAlert($ionicPopup,'Please enter a comment');
+      showIonicAlert($ionicPopup,$filter('translate')('enterCom'), $filter);
     } else{
       $scope.paramsList['rootHolderId'] = obsId ;
       $scope.paramsList['rootHolderType'] = "species.participation.Observation" ;
@@ -936,7 +848,7 @@ $scope.paramsList ={};
           $scope.commentList.push({"userIcon":"","userId":"","userName":"me","activityAction":"","activityName":$scope.reply.replyText,"date":"now","fullDate":""});
           $scope.reply.replyText ='';
           $scope.replyDiv = false;
-          showToast($cordovaToast,"successfully added, please visit the page again to see updated details");
+          showToast($cordovaToast,$filter('translate')('addedComment'));
 
         }
       });
@@ -945,7 +857,7 @@ $scope.paramsList ={};
     }
    }
   $scope.suggestNames = function(){
-    console.log($scope.suggest);
+    //console.log($scope.suggest);
     $scope.addReco = {
       obvId:obsId,
       recoName:'',
@@ -956,7 +868,7 @@ $scope.paramsList ={};
     };
     
     if($scope.suggest.commonName == '' && $scope.suggest.sciName ==''){
-      showIonicAlert($ionicPopup,'Please enter a name');
+      showIonicAlert($ionicPopup,$filter('translate')('enterName'), $filter);
       return;
     }
 
@@ -970,6 +882,7 @@ $scope.paramsList ={};
     if($scope.suggest.comment.length >0){
       $scope.addReco.recoComment = $scope.suggest.comment;
     }
+
     if($scope.suggest.recoId != 0 || $scope.suggest.recoId !='' ){
       $scope.addReco.recoId = $scope.suggest.recoId;
     }
@@ -985,7 +898,7 @@ $scope.paramsList ={};
 
     $scope.suggest.sciName='',
     $scope.suggest.commonName ='',
-    $scope.suggest.comment='',
+    $scope.suggest.recoComment='',
     BrowseService.GetRecommendationVotes(obsId).then(function(recommendationVotes){
     //$scope.acceptedName = true;
     console.log(recommendationVotes);
@@ -1007,8 +920,8 @@ $scope.paramsList ={};
   });
 
   }
-  
-  var idList = BrowseService.GetIDArrayBrowse();
+
+      var idList = BrowseService.GetIDArrayBrowse();
 
       var indexElement ;
       for(var x=0; x<idList.length;x++){
@@ -1016,7 +929,29 @@ $scope.paramsList ={};
           indexElement = x;
         }
       }
-  
+  //var element = angular.element(document.querySelector('#eventPlaceholder'));
+      /*$ionicGesture.on('swiperight', function (event) {
+        alert('right');
+        $scope.$apply(function () {
+          alert(indexElement);
+
+          if(indexElement != 0){}
+          $state.go('app.browsedetails',{browseId:idList[(indexElement)-1]});
+        });
+      }, element);
+
+     $ionicGesture.on('swipeleft', function (event) {
+              alert('left');
+
+        $scope.$apply(function () {
+
+          alert(indexElement);
+          if(indexElement != idList.length){
+            alert(idList[(indexElement)+1]);
+            $state.go('app.browsedetails',{browseId:idList[(indexElement)+1]});
+          }
+        });
+      }, element);  */
     $scope.goBacking = function(){
       /*console.log($ionicHistory.viewHistory());
       var logHistory = $ionicHistory.viewHistory().histories;
@@ -1064,7 +999,9 @@ $scope.paramsList ={};
           }
     };
 
-    $scope.getTestItems = function (query) {
+
+
+       $scope.getTestItems = function (query) {
                       //alert(query);
                        var itemArray = [];
                       itemArray.push({view: query,"acceptedName":'',recoId:0,'showField':query})
@@ -1161,7 +1098,7 @@ $scope.paramsList ={};
 
           $scope.showImages = function(index) {
            $scope.activeSlide = index;
-           $scope.showModal('templates/image-popover.html');
+           $scope.showModal('templates/image-poper.html');
           }
 
           $scope.showModal = function(templateUrl) {
@@ -1178,7 +1115,7 @@ $scope.paramsList ={};
            $scope.modal.remove()
          };
 
-         $scope.userGroups =[];
+          $scope.userGroups =[];
          $scope.showMyGroups = false;
           var groups = UserGroupService.GetUserJoinGroups();
           var instanceList = groups['data']['model']['observations'];
@@ -1239,8 +1176,7 @@ $scope.paramsList ={};
                    BrowseService.GetActivityFeed(obsId,'').then(function(feedList){
                     $scope.showMore = true;
                       console.log(feedList);
-                      //$scope.timeVal = feedList['data']['newerTimeRef'] ;
-                      $scope.commentList = [];
+                      $scope.timeVal = feedList['data']['newerTimeRef'] ;
                       parsingFeedDetails($scope,feedList['data']['model']['feeds'],$filter,UserGroupService);
 
                       //$scope.commentList.push({"userName":"karthik","activityAction":"Posted observation to group","activityName":"Western Ghats"}, {"userName":"karthik","activityAction":"Posted observation to group","activityName":"Western Ghats"});
@@ -1260,7 +1196,7 @@ $scope.paramsList ={};
                   }
 
                 }
-                showToast($cordovaToast, type+" successfull, you can check the updated details in Activity Feed")
+                showToast($cordovaToast, type+""+$filter('translate')('checkAF'))
               }
 
             }, function (err){
@@ -1268,28 +1204,30 @@ $scope.paramsList ={};
               //$scope.acceptedName = false;
             });
           }else{
-            showIonicAlert($ionicPopup,'Please select a group');
+            showIonicAlert($ionicPopup,$filter('translate')('selectGroup'),$filter);
             console.log($scope.userGroupIDVal);
           }
           }
 
+
+
+
 })
 
-function showIonicAlert($ionicPopup,message){
+function showIonicAlert($ionicPopup,message,$filter){
 
       $ionicPopup.alert({
-          title: 'ERROR',
+          title: $filter('translate')('error'),
           content: message//'You must submit atleast one image'
         });
     }
 
 function parsingRecoDetails($scope, recommendationDetails, userId){
-console.log(recommendationDetails);
+
   $scope.agreeDetails =[];
   if(recommendationDetails.length>0){
     $scope.checkReco = true;
     var buttonVal = false;
-    var normalisedName;
   for(var i=0; i< recommendationDetails.length; i++){
     var agreedUser =[];
     for(var j=0; j< recommendationDetails[i]['authors'].length; j++){
@@ -1311,18 +1249,13 @@ console.log(recommendationDetails);
           //$("#removeButton"+recommendationDetails[i]['recoId']).hide();
        }
     }
-    if(recommendationDetails[i].hasOwnProperty('normalizedForm')){
-      normalisedName = recommendationDetails[i]['normalizedForm'];
-    }else{
-      normalisedName = recommendationDetails[i]['name'];
-    }
-      $scope.agreeDetails.push({"noOfVotes":recommendationDetails[i]['noOfVotes'] ,"canonicalForm":normalisedName ,"commonNames": recommendationDetails[i]['commonNames'],"userDetails":agreedUser, "recoId":recommendationDetails[i]['recoId'], "buttonVal":buttonVal })
+      $scope.agreeDetails.push({"noOfVotes":recommendationDetails[i]['noOfVotes'] ,"canonicalForm": recommendationDetails[i]['name'],"commonNames": recommendationDetails[i]['commonNames'],"userDetails":agreedUser, "recoId":recommendationDetails[i]['recoId'], "buttonVal":buttonVal })
       //alert(typeof($scope.agreeDetails[0]['noOfVotes']));
     }
   }else {
     $scope.checkReco = false;
   }
-console.log($scope.agreeDetails);
+
 
 }
 function parsingFeedDetails($scope,feedDetails,$filter,UserGroupService){
@@ -1383,10 +1316,10 @@ function browsingArray($scope,obsDetails,obsId,NewObservationService){
   $scope.insertDetails = [];
   var imgDetails=[];
   var userid;
-  console.log(obsDetails);
+  //console.log(obsDetails);
   for(var i=0;i<obsDetails.length;i++){
       $scope.postedGroupID = [];
-if(Object.keys(obsDetails[i].maxVotedReco).length >0){
+  if(Object.keys(obsDetails[i].maxVotedReco).length >0){
     if(obsDetails[i].maxVotedReco.hasOwnProperty('commonNamesRecoList')){
             commonname = obsDetails[i].maxVotedReco.commonNamesRecoList[0].name;
         }else {
@@ -1432,8 +1365,7 @@ if(Object.keys(obsDetails[i].maxVotedReco).length >0){
       notes =  $("<p>").html(obsDetails[i].notes).text();
 
       author = obsDetails[i].author.name;
-      place = obsDetails[i].reverseGeocodedName;
-      if(obsDetails[i].hasOwnProperty('userGroups')){
+      place = obsDetails[i].reverseGeocodedName;if(obsDetails[i].hasOwnProperty('userGroups')){
               for(var j=0;j<obsDetails[i].userGroups.length;j++){
                 $scope.postedGroupID.push(obsDetails[i].userGroups[j].id)
               }
@@ -1474,30 +1406,25 @@ if(Object.keys(obsDetails[i].maxVotedReco).length >0){
 
 }
 
-appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCamera,$cordovaDatePicker,LocationService,$ionicPopup,$cordovaDevice, $cordovaFile, $ionicPlatform,  $ionicActionSheet, $filter, $cordovaFileTransfer, ApiEndpoint, UserGroupService, NewObservationService, $cordovaSQLite, $cordovaToast,$cordovaGeolocation,$timeout) {
+appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCamera,LocationService,$ionicPopup,$cordovaDevice, $cordovaFile, $ionicPlatform,  $ionicActionSheet, $filter, $cordovaFileTransfer, ApiEndpoint, UserGroupService, NewObservationService, $cordovaSQLite, $cordovaToast, $cordovaGeolocation, $timeout) {
   $scope.submitObsVal = false;
   //alert("came")
-      $scope.submitObsParams = {};
-    $scope.submitDbParams = {};
-    $scope.imgURI =[];
-    $scope.userGroupId = [];
   var obsDetails = NewObservationService.GetEditObsDetails();
   console.log(obsDetails);
   var z=0;
-  var date = $filter('date')(obsDetails.fromDate,'dd/MM/yyyy');
+  var date = new Date(obsDetails.fromDate);
   console.log(date);
-  $scope.submitDbParams['group_id']   =  obsDetails.group['id'] ;
-       //$("#categoryName").text(obsDetails.group['name']);
-       $scope.nameCategory = obsDetails.group['name']
  $scope.newobs ={
       sciName    :'',
       commonName :'',
       notes : '',
-      recoId:'',
       boxVal : false
     };
     $scope.newobs.date = date;
-
+    $scope.submitObsParams = {};
+    $scope.submitDbParams = {};
+    $scope.imgURI =[];
+    $scope.userGroupId = [];
 
     var address = LocationService.GetUserSelectedLocAdd();
     //alert(address);
@@ -1506,11 +1433,9 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
     }else{
     $scope.newobs['location'] = obsDetails.reverseGeocodedName;
   }
-
+  var oComonName, oSciNm;
       $scope.imageLicense = [{"id":"CC PUBLIC-DOMAIN","imageName":"publicDomain.png"},{"id":"CC BY","imageName":"cc-by.png"},{"id":"CC BY-SA","imageName":"by_sa.png"},{"id":"CC BY-NC","imageName":"by_nc.png"},{"id":"CC BY-NC-SA","imageName":"by_nc_sa.png"},{"id":"CC BY-NC-ND","imageName":"by_nc_nd.png"},{"id":"CC BY-ND","imageName":"by_nd.png"}];
-
-      var imgNameString;
-
+var imgNameString;
     // $("#Locationval").text(obsDetails.reverseGeocodedName);
       for(var i=0; i<obsDetails['resource'].length; i++){
         $("#imgContent").show();
@@ -1528,86 +1453,58 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
        
 
       }
-      //console.log($scope);
+
+    // $("#Locationval").text(obsDetails.reverseGeocodedName);
       
+      console.log($scope);
+
      if(Object.keys(obsDetails.maxVotedReco).length >0){
 
         if(obsDetails.maxVotedReco.hasOwnProperty('commonNamesRecoList')){
               $scope.newobs.commonName = obsDetails.maxVotedReco.commonNamesRecoList[0]["name"];
+              oComonName = obsDetails.maxVotedReco.commonNamesRecoList[0]["name"];
           }
 
         if(obsDetails.maxVotedReco.hasOwnProperty('sciNameReco')){
                 $scope.newobs.sciName = obsDetails.maxVotedReco.sciNameReco.name;
+                oSciNm = obsDetails.maxVotedReco.sciNameReco.name;
+
           } 
       
     }
+
     if(obsDetails.hasOwnProperty('notes')){
       $scope.newobs.notes = obsDetails.notes;
     }
-    /*$(function () {
+    $(function () {
       $('#check').change(function () {
           $(".check1").toggle(this.checked);
       });
-  });*/
-
-          //$('#uGroupText').text(obsDetails['userGroups'].length);
-          $scope.usergroupLength = obsDetails['userGroups'].length;
-
+  });
+    $('#uGroupText').text(obsDetails['userGroups'].length);
     if(obsDetails['userGroups'].length > 0){
-
       for (var z = 0; z < obsDetails['userGroups'].length; z++) {
           $scope.userGroupId.push(obsDetails['userGroups'][z].id);
       }
     }
 
-
-     $scope.speciesGroups = [{"id":841,"name":"Mammals"},{"id":837,"name":"Birds"},{"id":845,"name":"Fish"},{"id":835,"name":"Amphibians"},{"id":843,"name":"Reptiles"},{"id":856,"name":"Molluscs"},{"id":839,"name":"Arthropods"},{"id":833,"name":"Plants"},{"id":831,"name":"Fungi"},{"id":830,"name":"Others"}];
-
-    $scope.categorySelect = function(){
-        $scope.listPopup = $ionicPopup.show({
-             template: '<ion-list class="item-icon-right">                                '+
-                       '  <ion-item class="item " id="uGroup{{usrgrps.id}}" ng-repeat="usrgrps in speciesGroups " ng-click="selectCategory({{usrgrps.id}},usrgrps.name);" > '+
-                       '    {{usrgrps.name}}                             '+
-                       '  </ion-item>                             '+
-                       '</ion-list>                               ',
-             title: 'Select Groups',
-             scope: $scope,
-             buttons: [
-               { text: 'Cancel' },
-             ]
-           });  
-       
-       }
-
-       $scope.selectCategory = function(id, name){
-       // alert(id+" "+name);
-        $scope.listPopup.close();
-       $scope.submitDbParams['group_id']   =  id ;
-       //$("#categoryName").text(name);
-       $scope.nameCategory = name;
-       }
-
-     $scope.openDate = function(){
-        var options1 = {
-        date: new Date(),
-        mode: 'date', // or 'time'
-        min: new Date() - 10000,
-        max: new Date() - 10000
-        
-      };
-      $cordovaDatePicker.show(options1).then(function(date1){
-            //alert(date);
-              var currentDate = getDatetime();
-              if(Date.parse(date1) > Date.parse(currentDate)){
-              $scope.newobs.date = $filter('date')(date,"dd/MM/yyyy");
-               showDailog("Please slect a valid date");
-               return;
-            }else {
-              $scope.newobs.date = $filter('date')( date1,"dd/MM/yyyy" );
-            }
-        });
-     }
-
+     $(function () {
+      $('#dateSight').change(function () {
+          //alert($scope.newobs.date);
+        $scope.date = $filter('date')( $scope.newobs.date );
+        console.log($scope.date);
+        var currentDate = getDatetime();
+        //console.log(currentDate);
+        if(Date.parse($scope.date) > Date.parse(currentDate)){
+           showDailog($filter('translate')('validDate'));
+           $scope.newobs.date = date;
+           return;
+        }else {
+          $scope.newobs.date = $filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
+        }
+        console.log($scope.newobs.date)
+      });
+  });
 
      
 
@@ -1617,9 +1514,8 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
     //console.log($filter('date')(new Date));
     return currentDate;
   };
-  
 
- $scope.modelToItemMethod = function (modelValue) {
+  $scope.modelToItemMethod = function (modelValue) {
 
       return {view:modelValue};
   }
@@ -1627,7 +1523,7 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
     $scope.modelToItem = function(modelValue){
      return {view:modelValue};
     }
-    $scope.getTestItems = function (query) {
+     $scope.getTestItems = function (query) {
                       //alert(query);
                        var itemArray = [];
                       itemArray.push({view: query,"acceptedName":'',recoId:0,showField:query})
@@ -1672,7 +1568,7 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
                         $scope.newobs.recoId = '';
                     };
 
-               $scope.getSuggestName = function (query) {
+                $scope.getSuggestName = function (query) {
                 //alert(query);
                  var itemArray = [];
                       itemArray.push({view: query,"acceptedName":'',showField:query})
@@ -1718,26 +1614,28 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
                   $scope.newobs.commonName = '';
               };
 
+  
+
  
 
-  $scope.addMedia = function() {
+      $scope.addMedia = function() {
 
-    if($scope.imgURI.length == 10){
-      showDailog("Maximum Images reached");
-      return;
-    }
-    $scope.hideSheet = $ionicActionSheet.show({
-      buttons: [
-        { text: 'Take photo' },
-        { text: 'Photo from library' }
-      ],
-      titleText: 'Add images',
-      cancelText: 'Cancel',
-      buttonClicked: function(index) {
-        $scope.addImage(index);
-      }
-    });
-  }
+          if($scope.imgURI.length == 10){
+            showDailog($filter('translate')('maxReached'));
+            return;
+          }
+          $scope.hideSheet = $ionicActionSheet.show({
+            buttons: [
+              { text: $filter('translate')('takePhoto') },
+              { text: $filter('translate')('fromLib') }
+            ],
+            titleText: $filter('translate')('addimg'),
+            cancelText: $filter('translate')('cancel'),
+            buttonClicked: function(index) {
+              $scope.addImage(index);
+            }
+          });
+        }
  
   $scope.addImage = function(type) {
     
@@ -1756,11 +1654,12 @@ appne.controller('EditObservationCtrl', function($scope,$state,$http,$cordovaCam
         openAlbum();
         break;
     }
-
 }
 
   function openCamera(){
-  
+
+
+
 var options = {
     destinationType: Camera.DestinationType.FILE_URI,
       sourceType: Camera.PictureSourceType.CAMERA,
@@ -1769,71 +1668,35 @@ var options = {
       popoverOptions: CameraPopoverOptions,
       saveToPhotoAlbum: true
   };
+
+  console.log(options);
   $cordovaCamera.getPicture(options).then(function(imageUrl) {
-     // var link =  "data:image/jpeg;base64," +imageUrl;
-      /*var link = imageUrl;
-      z++;
-      $scope.imgURI.push({"id":z,"path":link});
-      console.log($scope.imgURI);*/
-      //console.log($scope.imageLink);
-      z++;
-      $("#imgContent").show();
+      
+                     $("#imgContent").show();
+
       onImageSuccess(imageUrl);
+      }, function(err) {
+                // An error occured. Show a message to the user
+          });
+}
 
-       function onImageSuccess(fileURI) {
-          createFileEntry(fileURI);
-       }
-       
-       function createFileEntry(fileURI) {
-          window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
-       }
-       
-       // 5
-       function copyFile(fileEntry) {
-        //alert(fileEntry);
-         var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
-         var newName = makeid() + name;
-         //alert(newName);
-         window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
-                   //alert(fileSystem2);
-
-         fileEntry.copyTo(fileSystem2,newName,onCopySuccess,fail);
-         },
-         fail);
-       }
-       
-       // 6
-       function onCopySuccess(entry) {
-         $scope.$apply(function () {
-          //alert(urlForImage(entry.nativeURL));
-          var justId = "meta"+z;
-         $scope.imgURI.push({"id":z,"path":urlForImage(entry.nativeURL), "valId":justId,"license":"CC BY","licImgg":"cc-by.png"});
-         data(justId);
-         });
-       }
-     }, function(err) {
-            // An error occured. Show a message to the user
-      });
-     }
-
-var countValue = 0;
-     function openAlbum(){
+function openAlbum(){
       $scope.imagesSelected = 0;
 
       window.imagePicker.getPictures(
           function(results) {
                 $("#imgContent").show();
                 $scope.imagesSelected = results.length;
-              $cordovaToast.show("Processing,Please wait", "short", "bottom").then(function(success) {
+              $cordovaToast.show($filter('translate')('processing'), "short", "bottom").then(function(success) {
                     console.log("The toast was shown");
                 });
               for (var i = 0; i < results.length; i++) {
                                 
-                if($scope.imgURI.length == 10){
-                  showToast($cordovaToast,"Maximum Images reached");
+                 if($scope.imgURI.length == 10){
+                  showToast($cordovaToast,$filter('translate')('maxReached'));
                   return;
                 }else{
-                 onAlbumSuccess(results[i]);
+                 onImageSuccess(results[i]);
                 }
               }
           }, function (error) {
@@ -1846,122 +1709,45 @@ var countValue = 0;
 
      }
 
-     function onAlbumSuccess(entry) {
-                z++;
-                countValue++;
+     
+ 
+       function onImageSuccess(fileURI) {
+          createFileEntry(fileURI);
+       }
+       
+       function createFileEntry(fileURI) {
+          window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
+       }
+       
+       // 5
+       function copyFile(fileEntry) {
+         var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
+         var newName = makeid() + name;
+         
+         window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
+         fileEntry.copyTo(fileSystem2,newName,onCopySuccess,fail);
+         },
+         fail);
+       }
+       
+       // 6
+       function onCopySuccess(entry) {
+               z++;
+
+              if($scope.imgURI.length >= 10){
+                  showToast($cordovaToast,$filter('translate')('maxReached'));
+                  return;
+                }else{
 
          $scope.$apply(function () {
           //alert(urlForImage(entry.nativeURL));
-          var justId = "meta"+z;
-          $scope.imgURI.push({"id":z,"path":entry, "valId":justId,"license":"CC BY","licImgg":"cc-by.png"});
-          if(countValue ==1){
-             data(justId);
-           }else if(countValue == $scope.imagesSelected){
-            countValue = 0;
-           }
-           if($scope.imagesSelected == 1){
-            countValue = 0;
-
-           }
+         $scope.imgURI.push({"id":z,"path":urlForImage(entry.nativeURL),"license":"CC BY","licImgg":"cc-by.png"});
          });
-       }
-
-        function printData(date, text){
-          
-          $scope.$apply(function () {
-            //alert(text);
-                  $scope.newobs.date = date;
-                  
-                });
         }
-       function data(valueId){
-        $timeout(function(){
-        var img_url=document.getElementById(valueId);
-         var confirmPopup = $ionicPopup.confirm({
-          title: 'Import Meta Data',
-          template: 'Do you want to set the date,time and Location of this observation from photo\'s metadata' 
-        });
-         confirmPopup.then(function(result) {
-
-            if(result) {
-           
-            // alert(img_url);
-                EXIF.getData(img_url, function() {
-                //alert(EXIF.pretty(this));
-                //alert(typeof(EXIF.pretty(this)));
-                if(EXIF.pretty(this) != ''){
-                  
-                //alert(EXIF.getTag(this, 'DateTime'));
-                var p;
-                //alert("ssd  "+typeof(EXIF.getTag(this, 'DateTimeOriginal')));
-                if(EXIF.getTag(this, 'DateTime')!= undefined){
-                  //alert('unideee');
-                   p = EXIF.getTag(this, 'DateTime');
-                } else {
-                  //alert('unde');
-                  p = EXIF.getTag(this, 'DateTimeOriginal');
-                }
-                var s = p.split(' ')[0].replace(':','/');
-                var index = 7;
-                s = s.substr(0, index) + '/' + s.substr(index + 1);
-                //alert(s);
-                var metaLocation = '';
-                if(EXIF.getTag(this, 'GPSLongitude') != undefined || EXIF.getTag(this, 'GPSLatitude') != undefined){
-                  var check =Icheck();
-
-                  var str = String(EXIF.getTag(this, 'GPSLongitude'));
-                   var metaLong = str.split(",")
-                   var str1 = String(EXIF.getTag(this, 'GPSLatitude'))
-                   var metaLat = str1.split(",")
-                   var latRef = EXIF.getTag(this, 'GPSLatitudeRef') ; 
-                   var lonRef = EXIF.getTag(this, 'GPSLongitudeRef ') ; 
-                    metaLat = (Number(metaLat[0]) + Number(metaLat[1]/60) + Number(metaLat[2]/3600)) * (latRef == "N" ? 1 : -1);  
-                    metaLong = (Number(metaLong[0]) + Number(metaLong[1]/60) + Number(metaLong[2]/3600)) * (lonRef == "W" ? -1 : 1);
-
-                   //alert(metaLat +" "+metaLong);
-
-                  if(check ==true){
-                   var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+metaLat+","+metaLong;
-                   //alert(code);
-                   $http.get(code).success(function(dataval){
-                      //console.log(dataval.results[0]);
-                      //alert(JSON.stringify(dataval));
-                      var texture =  dataval.results[0]["formatted_address"];
-                      //alert(texture +" "+typeof(dataval.results[0]["formatted_address"]));
-                     // printData(s,texture);
-                     
-                            $scope.newobs.date = reverseStr(s);
-                            var setUser1 = {"H":metaLat, "L":metaLong}
-                            LocationService.SetUserSelectedLocation( setUser1);
-                              $('#Locationval').text(texture);
-                      
-                    }).error(function(data){
-                         //alert(JSON.stringify(data));
-                    });
-                  }else {
-                    var texting = "Lattitude:"+metaLat+"longitude"+metaLong;
-                      //printData(s, texting);
-                    
-                            $scope.newobs.date = reverseStr(s);
-                            var setUser = {"H":metaLat, "L":metaLong}
-                            LocationService.SetUserSelectedLocation( setUser);
-                              $('#Locationval').text(texting);
-                   
-                  }
-                }else {
-                
-                printData(reverseStr(s), "");
-              }
-              }
-                //alert("Longitude ="+EXIF.getTag(this, 'GPSLongitude'));
-                });
-            }
-        });
-              
-          },500);
        }
+       
        function fail(error) {
-         // alert("fail: " + JSON.stringify(error));
+          console.log("fail: " + error.code);
        }
        
        function makeid() {
@@ -1974,17 +1760,9 @@ var countValue = 0;
          return text;
        }
 
+      
 
-
-
-
-
-
-  //}, function(err) {
-            // An error occured. Show a message to the user
-    //  });
-
-
+    
 
       function urlForImage(imageName) {
         //alert($scope.imgURI.length);
@@ -2013,105 +1791,102 @@ var countValue = 0;
 
     //alert(id);
     }
-
     $scope.showLicense = function(imageNumber){
-  $scope.imageVal = imageNumber;
-  $scope.licensePopup = $ionicPopup.show({
-         template: '  <img ng-repeat="img in imageLicense" style=" padding: 5px 5px 5px 5px;" ng-src="img/{{img.imageName}}" ng-click="selectedLicense(img.id, img.imageName);" > '+
-                   '  </img>   ',
-         title: 'Choose License',
-         scope: $scope,
-         buttons: [
-           { text: 'cancel' },
-         ]
-       }); 
-}
-$scope.selectedLicense = function(licenseId, imgName){
-  $scope.licensePopup.close();
-  //$(".img-wrap #license"+$scope.imageVal).css("background", "url(img/"+imgName+") no-repeat");
-  //$scope.submitDbParams["license_"+$scope.imageVal] = licenseId;
-  for(var i=0; i<$scope.imgURI.length;i++){
-    if($scope.imgURI[i]['id']==$scope.imageVal){
-      $scope.imgURI[i]['license'] = licenseId;
-      $scope.imgURI[i]['licImgg'] = imgName;
-      break;
+      $scope.imageVal = imageNumber;
+      $scope.licensePopup = $ionicPopup.show({
+             template: '  <img ng-repeat="img in imageLicense" style=" padding: 5px 5px 5px 5px;" ng-src="img/{{img.imageName}}" ng-click="selectedLicense(img.id, img.imageName);" > '+
+                       '  </img>   ',
+             title: $filter('translate')('chooseLicense'),
+             scope: $scope,
+             buttons: [
+               { text: $filter('translate')('canc') },
+             ]
+           }); 
     }
-  }
+    $scope.selectedLicense = function(licenseId, imgName){
+      $scope.licensePopup.close();
+      //$(".img-wrap #license"+$scope.imageVal).css("background", "url(img/"+imgName+") no-repeat");
+      //$scope.submitDbParams["license_"+$scope.imageVal] = licenseId;
+      for(var i=0; i<$scope.imgURI.length;i++){
+        if($scope.imgURI[i]['id']==$scope.imageVal){
+          $scope.imgURI[i]['license'] = licenseId;
+          $scope.imgURI[i]['licImgg'] = imgName;
+          break;
+        }
+      }
 
-}
-
-   $scope.gps = function(){
-  
-
-   $scope.gpsPopup = $ionicPopup.show({
+    }
+    $scope.gps = function(){
+      $scope.gpsPopup = $ionicPopup.show({
          template: '<ion-list class="item-icon-right">                                '+
                    '  <ion-item class="item "  ng-click="currentGPS();" > '+
-                   '    Get Current Location                             '+
+                   '    {{"getLoc" | translate}}                             '+
                    '  </ion-item>                             '+
                    '  <ion-item class="item "  ng-click="editGPS();" > '+
-                   '   Edit Location                             '+
+                   '   {{"editLoc" | translate}}                             '+
                    '  </ion-item>                             '+
                    '</ion-list>                               ',
-         title: 'Edit Location',
+         title: $filter('translate')('editLoc') ,
          scope: $scope,
          buttons: [
-           { text: 'cancel' },
+           { text: $filter('translate')('canc') },
          ]
        }); 
-  
+  /**/
 }
-$scope.currentGPS = function(){
-  $scope.gpsPopup.close();
-  onGPS($cordovaGeolocation,LocationService,$ionicPopup);
-  //$("#Locationval").text("Please Wait ...");
-  $scope.newobs.location = "Please Wait ...";
-  $timeout(function() {
-    var data = LocationService.getCurrentLocation();
-    var check =Icheck();
-    if(check ==true){
-    //.then(function(data){
-   // alert(JSON.stringify(data));
-      var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data.latitude+","+data.longitude;
-      var loc = {'H':data.latitude , 'L':data.longitude};
-            LocationService.SetUserSelectedLocation(loc);
-      $http.get(code).success(function(dataval){
-            //console.log(dataval.results[0]);
-            //$("#Locationval").text(dataval.results[0]["formatted_address"]);
-            $scope.newobs.location = dataval.results[0]["formatted_address"];
+    $scope.currentGPS = function(){
+     $scope.gpsPopup.close();
+     onGPS($cordovaGeolocation,LocationService,$ionicPopup);
+     //$("#Locationval").text("Please Wait ...");
+      $scope.newobs.location = $filter('translate')('plsWait');
+     $timeout(function() {
+       var data = LocationService.getCurrentLocation();
+       var check =Icheck();
+       if(check ==true){
+       //.then(function(data){
+      // alert(JSON.stringify(data));
+         var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data.latitude+","+data.longitude;
+         var loc = {'H':data.latitude , 'L':data.longitude};
+               LocationService.SetUserSelectedLocation(loc);
+         $http.get(code).success(function(dataval){
+               //console.log(dataval.results[0]);
+               //$("#Locationval").text(dataval.results[0]["formatted_address"]);
+               $scope.newobs.location = dataval.results[0]["formatted_address"];
 
-          });
-    }else {
-      //$("#Locationval").text("Lattitude:"+data.latitude+"longitude"+data.longitude);
-      $scope.newobs.location = "Lattitude:"+data.latitude+" longitude"+data.longitude;
-      var loc = {'H':data.latitude , 'L':data.longitude};
-       LocationService.SetUserSelectedLocation(loc);
+             });
+       }else {
+         //$("#Locationval").text("Lattitude:"+data.latitude+"longitude"+data.longitude);
+         $scope.newobs.location = "Lattitude:"+data.latitude+" longitude"+data.longitude;
+         var loc = {'H':data.latitude , 'L':data.longitude};
+          LocationService.SetUserSelectedLocation(loc);
+       }
+     }, 5000);
+     
     }
-  }, 5000);
-  
-}
-$scope.editGPS = function(){
- $scope.gpsPopup.close();
-  var inter = Icheck();
-    if(inter == false){
-      showToast($cordovaToast,"No Internet")
-      return;
-    }else {
-      $('ion-nav-bar').addClass('hide');
-      $state.go("app.location");
+    $scope.editGPS = function(){
+    $scope.gpsPopup.close();
+     //var inter = internetCheck($ionicPopup);
+     var inter = Icheck();
+       if(inter == false){
+      showToast($cordovaToast,$filter('translate')('noInternet'))
+         return;
+       }else {
+         $('ion-nav-bar').addClass('hide');
+         $state.go("app.location");
+       }
     }
-}
-
 
     function showDailog(message){
 
       $ionicPopup.alert({
-          title: 'ERROR',
+          title: $filter('translate')('error'),
           content: message//'You must submit atleast one image'
         });
     }
 
 
 
+$scope.select = [];
     $scope.userGroup = function(){
       //alert("hhh");
       $scope.usrGrp =[]
@@ -2132,17 +1907,17 @@ $scope.editGPS = function(){
                    '  </ion-item>                             '+
                    '</ion-list>                               ',
          
-         title: 'Select Groups',
+         title: $filter('translate')('selectgrp'),
          scope: $scope,
          buttons: [
-           { text: 'Ok' },
+           { text: $filter('translate')('ok') },
          ]
        });   
 
       } else {
        var lispop = $ionicPopup.alert({
-                title: 'Success',
-                content: 'Join atleast one user groups'
+                title: $filter('translate')('join'),
+                content: $filter('translate')('noGroup')
               });
             
       }
@@ -2172,8 +1947,7 @@ $scope.editGPS = function(){
        $scope.vedio = true;
       }
 
-       //$('#uGroupText').text($scope.userGroupId.length);
-       $scope.usergroupLength = $scope.userGroupId.length;
+       $('#uGroupText').text($scope.userGroupId.length);
       console.log($scope.userGroupId);
     }
 
@@ -2196,17 +1970,17 @@ $scope.editGPS = function(){
       //if($scope.newobs)
 
       if($scope.imgURI.length == 0){
-        showDailog("You must submit atleast one image");
+        showDailog($filter('translate')('atleatOne'));
         return;
       }
       if($scope.newobs.date == null){
-        showDailog("You must enter date");
+        showDailog($filter('translate')('enterDate'));
         return;
       }
       if($scope.newobs.boxVal == false){
         //console.log($scope.newobs['sciName'].length());
         if($scope.newobs['sciName'].length==0 && $scope.newobs['commonName'].length==0){
-          showDailog("Please enter all fields");
+          showDailog($filter('translate')('enterFields'));
           return;
         }
       } else {
@@ -2216,116 +1990,359 @@ $scope.editGPS = function(){
       }
       //console.log($('#Locationval').text());
       $scope.locationAddress = $scope.newobs['location'];
-            if($scope.locationAddress == 'Location' || $scope.locationAddress == 'Searching' || $scope.locationAddress == 'Please Wait ...'){
-        showDailog("Please Select location by clicking on GPS button");
+      if($scope.locationAddress == 'Location' || $scope.locationAddress == 'Searching' || $scope.locationAddress == 'Please Wait ...'){
+        showDailog($filter('translate')('selectLoc'));
         return;
+      /*if($scope.locationAddress == 'Location'){
+        //alert($scope.locationAddress);
+        var confirmPopup = $ionicPopup.confirm({
+           title: 'Location',
+           template: 'you didnt entered Location. Default location will be taken'
+         });
+         confirmPopup.then(function(res) {
+           if(res) {
+            $scope.locationAddress = "Lally Tollendal Street, White Town, Puducherry, Puducherry 605002, India"; 
+            //$('#Locationval').text($scope.locationAddress);
+            $scope.newobs['location'] = $scope.locationAddress;
+            var loc = {'H':11.93707847595214 , 'L':79.83552551269528}
+            LocationService.SetUserSelectedLocation(loc);
+            if(check == false) {
+              //alert("store"+check);
+              storeinDb();
+            }else {
+               //alert("exec"+check);
+              executeRequest();
+             }
+           } else {
+             console.log('You are not sure');
+             return;
+           }
+         });*/
       }else {
-         storeinDb();
-        }
+        storeinDb();
+        /*if(check == false) {
+          storeinDb();
+        }else {
+          executeRequest();
+         }*/
+      }
       
       
     }
-
     function storeinDb(){
-       //console.log($state);
-             var check1 =Icheck();
+           //console.log($state);
+                 var check1 =Icheck();
 
 
-      $scope.imgName = [];
-      //alert("storedb");
-      if(check1==false){
-        showToast($cordovaToast,"Your observation will be submitted when you are next online.");
-      }else {
-        showToast($cordovaToast,"Your observation will be submitted shortly");
+          $scope.imgName = [];
+          //alert("storedb");
+          if(check1==false){
+            showToast($cordovaToast,$filter('translate')('submitNextOnline'));
+          }else {
+            showToast($cordovaToast, $filter('translate')('submitNow'));
+
+          }
+          console.log("storedb");
+          console.log(db);
+            //console.log("SUBMIT USER"+uLatLong.latitude+" SUBMI "+uLatLong.longitude)
+            $scope.submitDbParams['observationId'] = obsDetails.id;
+            $scope.submitDbParams['group_id']   =  10;
+            $scope.submitDbParams['habitat_id'] = 1;
+            $scope.submitDbParams['fromDate']   = $scope.newobs.date;
+            $scope.submitDbParams['placeName']  = $scope.locationAddress;
+            //$scope.submitDbParams['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+             if(address != ''){
+                      var uLatLong = LocationService.GetUserSelectedLocation();
+
+                $scope.submitDbParams['areas']  = "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+             }else{
+                $scope.submitDbParams['areas'] = obsDetails.topology;
+            }
+            $scope.submitDbParams['notes']      = $scope.newobs.notes;
+           
+            $scope.submitDbParams['imagePath']  = $scope.imgURI;
+            //console.log(JSON.stringify($scope.submitDbParams));;
+            if($scope.newobs['sciName'].length>0){
+              $scope.submitDbParams['recoName'] = $scope.newobs['sciName'];
+            } else {
+              $scope.submitDbParams['recoName'] = "Unknown";
+            }
+            if($scope.newobs['commonName'].length>0){
+              $scope.submitDbParams['commonName'] = $scope.newobs['commonName'];
+            } else {
+              $scope.submitDbParams['commonName'] = "";
+            }
+            if($scope.newobs['recoId'] == ''){
+              delete $scope.newobs['recoId'];
+            }else{
+              $scope.submitDbParams['recoId'] = $scope.newobs['recoId']
+            }
+            $scope.submitDbParams['resourceListType'] = "ofObv" ;
+            $scope.submitDbParams['agreeTerms'] = "on";
+            if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
+              $scope.submitDbParams['userGroupsList'] = $scope.userGroupId
+            }
+            //alert("came");
+            console.log(JSON.stringify($scope.submitDbParams));
+            var query = "INSERT INTO observation (status,obslist) VALUES (?,?)";
+            $cordovaSQLite.execute(db, query, ["PENDING",JSON.stringify($scope.submitDbParams)]).then(function(res) {
+                console.log("INSERT ID -> " + res.insertId);
+                      $state.go("app.home");
+
+
+                //alert("transacted");
+            }, function (err) {
+              //alert(err);
+                console.error(err);
+            });
+        }
+    function executeRequest(){
+      $state.go("app.home");
+      showToast($cordovaToast,"Your observation will be submitted shortly");
+
+      $scope.times = 0;
+      var tokenvar = localStorage.getItem('USER_KEY');
+      var tokenvar1 = JSON.parse(tokenvar);
+      var token = tokenvar1.userKey;
+      var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
+      $scope.count =0;
+      $scope.newImageStr = [];
+      $scope.storeImg = $scope.imgURI;
+      console.log($scope.newobs);
+       var options = new FileUploadOptions();
+       $scope.nativeImg = [];
+       for(var i = 0;i < $scope.imgURI.length; i++){
+          var imageLink = $scope.imgURI[i]['path'] ;
+          if(imageLink.match("http://")){
+
+           var nameCreate =  "/"+imageLink.split('//')[2];
+
+              $scope.newImageStr.push(nameCreate);
+              $scope.count++;
+              if($scope.count == $scope.imgURI.length){
+              //alert("parse");
+              console.log("win parsing "+ $scope.count +" called parse resource");
+              console.log(Object.keys($scope.newImageStr).length);
+              parseResourceDetails();
+             }
+          } else {
+              $scope.nativeImg.push(imageLink);
+          }
+        }
+       
+        for(var i = 0;i < $scope.nativeImg.length; i++){
+          var imageLink = $scope.nativeImg[i] ;
+          
+            options.fileKey = "resources",
+            options.fileName = imageLink.substr(imageLink.lastIndexOf('/')+1),
+            options.chunkedMode = false,
+            options.mimeType = "image/jpg",
+            options.httpMethod = "POST",
+            options.headers =  {
+            "X-Auth-Token":token,
+            "X-AppKey":appkey
+          }
+
+          var ft = new FileTransfer();
+          var uri = encodeURI(ApiEndpoint.url+"/observation/upload_resource?resType=species.participation.Observation");
+          
+          //alert("file");
+          ft.upload(imageLink, uri, win, fail, options);
+        }
 
       }
-      console.log("storedb");
-      console.log(db);
-        //console.log("SUBMIT USER"+uLatLong.latitude+" SUBMI "+uLatLong.longitude)
 
-        $scope.submitDbParams['observationId'] = obsDetails.id;
-        $scope.submitDbParams['habitat_id'] = 267835;//267838
-        $scope.submitDbParams['fromDate']   = $scope.newobs.date;
-        $scope.submitDbParams['placeName']  = $scope.locationAddress;
-        //$scope.submitDbParams['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
-         if(address != ''){
-                  var uLatLong = LocationService.GetUserSelectedLocation();
+          function win(data){
+            //alert(response);
+            //alert(JSON.stringify(response));
+            //var val = JSON.stringify(response);
+            //alert(data.response);
+            //alert(data.response[0]);
+            //console.log(data.response);
+            var parsedData = JSON.parse(data.response);
+            //alert(dat["model"]["observations"]["resources"]);
+            //alert(parsedData["model"]);
+            //alert(val.response["model"]["observations"]["resources"])
+             //alert(jArray);
+             
 
-            $scope.submitDbParams['areas']  = "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
-         }else{
-            $scope.submitDbParams['areas'] = obsDetails.topology;
-        }
-        $scope.submitDbParams['notes']      = $scope.newobs.notes;
-       
-        $scope.submitDbParams['imagePath']  = $scope.imgURI;
-        //console.log(JSON.stringify($scope.submitDbParams));;
-        if($scope.newobs['sciName'].length>0){
-          $scope.submitDbParams['recoName'] = $scope.newobs['sciName'];
-        } else {
-          $scope.submitDbParams['recoName'] = "Unknown";
-        }
-        if($scope.newobs['recoId'] == ''){
-          delete $scope.newobs['recoId'];
-        }else{
-          $scope.submitDbParams['recoId'] = $scope.newobs['recoId']
-        }
-        if($scope.newobs['commonName'].length>0){
-          $scope.submitDbParams['commonName'] = $scope.newobs['commonName'];
-        } else {
-          $scope.submitDbParams['commonName'] = "";
-        }
-        $scope.submitDbParams['resourceListType'] = "ofObv" ;
-        $scope.submitDbParams['agreeTerms'] = "on";
-        if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
-          $scope.submitDbParams['userGroupsList'] = $scope.userGroupId
-        }
-        //alert("came");
-        console.log(JSON.stringify($scope.submitDbParams));
-        var query = "INSERT INTO observation (status,obslist) VALUES (?,?)";
-        $cordovaSQLite.execute(db, query, ["PENDING",JSON.stringify($scope.submitDbParams)]).then(function(res) {
-            console.log("INSERT ID -> " + res.insertId);
-                  $state.go("app.observationStatus");
+             var jArray = [];
+             jArray = parsedData["model"]["observations"]["resources"];
+             //alert(jArray[0]);
 
-            //alert("transacted");
-        }, function (err) {
-          //alert(err);
-            console.error(err);
-        });
-    }
+             if(jArray!=null && jArray.length>0){
+                for(var i=0; i<jArray.length; i++){
 
-   
+                  $scope.newImageStr.push(jArray[i]["fileName"]);
+
+                }
+              $scope.count++;
+             }
+
+             //alert($scope.count);
+
+             if($scope.count == $scope.imgURI.length){
+              //alert("parse");
+              console.log("win parsing "+ $scope.count +" called parse resource");
+              console.log(Object.keys($scope.newImageStr).length);
+              parseResourceDetails();
+             }
+          }
+          function fail(err){
+            $scope.times++;
+            //alert(err);
+            if($scope.times == 1){
+            statusCheck();
+          }
+            console.log("error:fail " + JSON.stringify(err));
+          }
+          
+
+          function parseResourceDetails(){
+            //alert("parseResourceDetails");
+            var count1 = 0;
+            console.log("newImgstr" + Object.keys($scope.newImageStr).length);
+            //alert(Object.keys($scope.newImageStr).length);
+            for(var i=0; i<Object.keys($scope.newImageStr).length; i++){
+              //alert()
+              count1++;
+              $scope.submitObsParams["file_"+(i+1)] = $scope.newImageStr[i];
+              $scope.submitObsParams["type_"+(i+1)] = "IMAGE";
+              $scope.submitObsParams["license_"+(i+1)] = "CC_BY";
+              
+              if(count1 == Object.keys($scope.newImageStr).length){
+                //alert("entered");
+                submitObservationFinally();
+              }
+            }
+            //console.log($scope.submitObsParams);
+            
+          }
+
+          function statusCheck(){
+            var sciName;
+            var commonName;
+            var obsNotes;
+            if($scope.newobs['sciName'].length>0){
+               sciName = $scope.newobs['sciName'];
+            } else {
+              sciName = "Unknown";
+            }
+            if($scope.newobs['commonName'].length>0){
+               commonName = $scope.newobs['commonName'];
+            } else {
+              commonName = "";
+            }
+            if($scope.newobs['notes'].length>0){
+               obsNotes = $scope.newobs['notes'];
+            } else {
+              obsNotes = "";
+            }
+            $scope.failedObs = {};
+
+             $scope.failedObs['recoName'] = sciName ;
+            $scope.failedObs['commonName'] = commonName ;
+            //$scope.failedObs['status'] =
+            $scope.failedObs['fromDate'] = $scope.newobs.date;
+            $scope.failedObs['placeName'] = $scope.locationAddress;
+            $scope.failedObs['notes'] = obsNotes ;
+            $scope.failedObs['imagePath'] = $scope.storeImg ;//$scope.imgURI;
+
+            $scope.failedObs['observationId'] = obsDetails.id;
+            $scope.failedObs['group_id']   =  10;
+            $scope.failedObs['habitat_id'] = 1;
+            $scope.failedObs['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+            $scope.failedObs['notes']      = $scope.newobs.notes;
+          
+           //console.log(JSON.stringify($scope.submitDbParams));;
+            $scope.failedObs['resourceListType'] = "ofObv" ;
+            $scope.failedObs['agreeTerms'] = "on";
+            if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
+             $scope.failedObs['userGroupsList'] = $scope.userGroupId
+            }
+
+            //NewObservationService.SetStatus(sciName, commonName, "FAILURE", $scope.newobs.date, $scope.locationAddress, obsNotes, $scope.imgURI);
+             var query = "INSERT INTO observation (status,obslist) VALUES (?,?)";
+              $cordovaSQLite.execute(db, query, ["PENDING",JSON.stringify($scope.failedObs)]).then(function(res) {
+                  console.log("INSERT ID -> " + res.insertId);
+                  //alert("transacted");
+              }, function (err) {
+                //alert(err);
+                  console.error(err);
+              });
+          }
+
+          function submitObservationFinally(){
+            var uLatLong = LocationService.GetUserSelectedLocation();
+            console.log("SUBMIT USER"+uLatLong.latitude+" SUBMI "+uLatLong.longitude)
+            $scope.submitObsParams['group_id']   =  10;//829;//10;
+            $scope.submitObsParams['habitat_id'] =  1;//267835; //1;
+            
+            $scope.newobs.date = $filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
+            //alert($scope.newobs.date);
+            $scope.submitObsParams['fromDate']   = $scope.newobs.date;
+            $scope.submitObsParams['placeName']  = $scope.locationAddress;
+            $scope.submitObsParams['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+            $scope.submitObsParams['notes']      = $scope.newobs.notes;
+          
+            if($scope.newobs['sciName'].length>0){
+              $scope.submitObsParams['recoName'] = $scope.newobs['sciName'];
+            }
+            if($scope.newobs['commonName'].length>0){
+              $scope.submitObsParams['commonName'] = $scope.newobs['commonName'];
+            }
+            $scope.submitObsParams['resourceListType'] = "ofObv" ;
+            $scope.submitObsParams['agreeTerms'] = "on";
+            if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
+              $scope.submitObsParams['userGroupsList'] = $scope.userGroupId
+            }
+            console.log($scope.submitObsParams);
+            NewObservationService.EditSubmitObservation($scope.submitObsParams,obsDetails.id).then(function(obsResponse){
+              
+              //alert("success" + JSON.stringify(obsResponse));;
+              if(obsResponse.data.success == false){
+
+               statusCheck();
+              }
+              console.log(obsResponse);
+            },
+            function(err){
+              //alert("Nosuccess");
+              console.log(err);
+               statusCheck();
+            });
+
+          }
 
     $scope.deleteObs = function(){
 
       var confirmPopup = $ionicPopup.confirm({
-           title: 'Delete Observation',
-           template: 'This Observation will be deleted. Are you sure ? '
+           title:  $filter('translate')('deleteObs'),
+           template: $filter('translate')('obsDeleted')
          });
          confirmPopup.then(function(result) {
            if(result) {
-
       NewObservationService.DeleteObservation(obsDetails.id).then(function(obsResponse){
               
               //alert("success" + obsResponse.data.success);
               if(obsResponse.data.success == false){
 
-               showToast($cordovaToast,"Observation couldnot be deleted");
+               showToast($cordovaToast,$filter('translate')('obsNotDeletes'));
               }else{
                // alert(result);
-                showToast($cordovaToast,"Observation deleted");
+                showToast($cordovaToast,$filter('translate')('obsDelete'));
                 $state.go("app.home");
                 
               }
               console.log(obsResponse);
             },
             function(err){
-             showDailog("Unknown Error occurred");
+             showDailog($filter('translate')('unknownErr'));
             });
       } else {
         return;
       }
     });
-
     } 
 
 
@@ -2333,13 +2350,11 @@ $scope.editGPS = function(){
 
   });
 
-
 function htmlToPlaintext(text) {
   return text ? String(text).replace(/<[^>]+>/gm, '') : '';
 }
 
-
-appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$location,$http,$cordovaCamera,$cordovaDatePicker,LocationService,$ionicPopup,$cordovaDevice, $cordovaFile, $ionicPlatform,  $ionicActionSheet, $filter, $cordovaFileTransfer, ApiEndpoint, UserGroupService, NewObservationService, $cordovaSQLite, $cordovaToast,$cordovaGeolocation, $timeout, $interval) {
+appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$location,$http,$cordovaCamera,LocationService,$ionicPopup,$cordovaDevice, $cordovaFile, $ionicPlatform,  $ionicActionSheet, $filter, $cordovaFileTransfer, ApiEndpoint, UserGroupService, NewObservationService, $cordovaSQLite, $cordovaToast, $cordovaGeolocation, $timeout, $interval) {
    //alert('new');
    UserGroupService.GetJoinedGroups().then(function(groups){
 
@@ -2350,9 +2365,22 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
       var tokenVar = JSON.parse(tokenVal);
       var countVal = tokenVar.nId;
       //alert(countVal);
-      var countVal1 =0
+      var countVal1 =0;
       var noLocation = false;
-      
+      /*if(countVal==0){
+        //var currentPageTemplate = $route.current.templateUrl;
+        //$templateCache.remove(currentPageTemplate);
+         //alert('came');
+       // $state.go($state.current, null, { reload: true });
+        //$location.path('/newObservation');
+        //$ionicHistory.clearCache([stateId]);
+        //alert($route.reload());
+        //$route.reload()
+        //$state.$current
+       location.reload();
+        tokenVar.nId = 1;
+        localStorage.setItem('USER_KEY',JSON.stringify(tokenVar));
+      } */
     setTimeout(function(){
       if($('ion-nav-bar').hasClass('hide')){
         //alert('came');
@@ -2371,51 +2399,23 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
       sciName    :'',
       commonName :'',
       notes : '',
-      recoId :'',
       boxVal : false
     };
     $scope.submitObsParams = {};
     $scope.submitDbParams = {};
     $scope.imgURI =[];
-
-    $scope.imageLicense = [{"id":"CC PUBLIC-DOMAIN","imageName":"publicDomain.png"},{"id":"CC BY","imageName":"cc-by.png"},{"id":"CC BY-SA","imageName":"by_sa.png"},{"id":"CC BY-NC","imageName":"by_nc.png"},{"id":"CC BY-NC-SA","imageName":"by_nc_sa.png"},{"id":"CC BY-NC-ND","imageName":"by_nc_nd.png"},{"id":"CC BY-ND","imageName":"by_nd.png"}];
-
-
-    $scope.newobs.date = $filter('date')(Date.now(),"dd/MM/yyyy");
+    $scope.newobs.date = new Date();
     /*$(function () {
-      $(document).on('change', '#categoryCheck', function() {
+      $(document).on('change', '#check', function() {
         //alert($scope.newobs.boxVal);
         $(".check1").toggle(this.checked);
       
       });
   });*/
-      $scope.speciesGroups = [{"id":841,"name":"Mammals"},{"id":837,"name":"Birds"},{"id":845,"name":"Fish"},{"id":835,"name":"Amphibians"},{"id":843,"name":"Reptiles"},{"id":856,"name":"Molluscs"},{"id":839,"name":"Arthropods"},{"id":833,"name":"Plants"},{"id":831,"name":"Fungi"},{"id":830,"name":"Others"}];
+    $scope.imageLicense = [{"id":"CC PUBLIC-DOMAIN","imageName":"publicDomain.png"},{"id":"CC BY","imageName":"cc-by.png"},{"id":"CC BY-SA","imageName":"by_sa.png"},{"id":"CC BY-NC","imageName":"by_nc.png"},{"id":"CC BY-NC-SA","imageName":"by_nc_sa.png"},{"id":"CC BY-NC-ND","imageName":"by_nc_nd.png"},{"id":"CC BY-ND","imageName":"by_nd.png"}];
 
-    $scope.categorySelect = function(){
-        $scope.listPopup = $ionicPopup.show({
-             template: '<ion-list class="item-icon-right">                                '+
-                       '  <ion-item class="item " id="uGroup{{usrgrps.id}}" ng-repeat="usrgrps in speciesGroups " ng-click="selectCategory({{usrgrps.id}},usrgrps.name);" > '+
-                       '    {{usrgrps.name}}                             '+
-                       '  </ion-item>                             '+
-                       '</ion-list>                               ',
-             title: 'Select Groups',
-             scope: $scope,
-             buttons: [
-               { text: 'Cancel' },
-             ]
-           });  
-       
-       }
 
-        $scope.selectCategory = function(id, name){
-          $scope.listPopup.close();
-        //alert(id+" "+name);
-         $scope.submitDbParams['group_id']   =  id ;
-         //$("#categoryName").text(name);
-         $scope.nameCategory = name;
-       }
-
-     /*$(function () {
+     $(function () {
       $(document).on('change', '#dateSight', function() {
       //$('#dateSight').change(function () {
           //alert($scope.newobs.date);
@@ -2425,35 +2425,16 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
         //console.log(currentDate);
         if(Date.parse($scope.date) > Date.parse(currentDate)){
           $scope.newobs.date = "";
-           showDailog("Please slect a valid date");
+           showDailog($filter('translate')('validDate'));
            return;
         }else {
           $scope.newobs.date = $filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
         }
         console.log($scope.newobs.date)
       });
-  });*/
+  });
 
-  $scope.openDate = function(){
-    var options1 = {
-    date: new Date(),
-    mode: 'date', // or 'time'
-    min: new Date() - 10000,
-    max: new Date() - 10000
-    
-  };
-  $cordovaDatePicker.show(options1).then(function(date){
-        //alert(date);
-          var currentDate = getDatetime();
-          if(Date.parse(date) > Date.parse(currentDate)){
-          $scope.newobs.date = $filter('date')(Date.now(),"dd/MM/yyyy");
-           showDailog("Please slect a valid date");
-           return;
-        }else {
-          $scope.newobs.date = $filter('date')( date,"dd/MM/yyyy" );
-        }
-    });
-     }
+     
 
 
   function getDatetime() {
@@ -2462,9 +2443,7 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
     return currentDate;
   };
 
-
-
- $scope.getTestItems = function (query) {
+  $scope.getTestItems = function (query) {
                       //alert(query);
                        var itemArray = [];
                       itemArray.push({view: query,"acceptedName":'',recoId:0,showField:query})
@@ -2490,7 +2469,6 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                      return {items :[]};
                       
                     };
-
                      $scope.itemsClicked = function (callback) {
                      
                       //alert(JSON.stringify(callback.selectedItems[0].view));
@@ -2509,7 +2487,7 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                         $scope.newobs.recoId = '';
                     };
 
-               $scope.getSuggestName = function (query) {
+             $scope.getSuggestName = function (query) {
                 //alert(query);
                  var itemArray = [];
                       itemArray.push({view: query,"acceptedName":'',recoId:0,showField:query})
@@ -2544,9 +2522,6 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                   if(callback.selectedItems[0].acceptedName!=''){
                     $scope.newobs.sciName = callback.selectedItems[0].acceptedName;
                     $("#sugestName").text(callback.selectedItems[0].acceptedName);
-                  }else{
-                    ////////////////////////////////////////////
-                    $scope.newobs.sciName =''
                   }
                   if(callback.selectedItems[0].recoId != 0){
                     $scope.newobs.recoId = callback.selectedItems[0].recoId;
@@ -2558,13 +2533,13 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                   $scope.newobs.commonName = '';
               };
 
-
   $scope.submitNewObs = function(){
     //console.log(document.getElementById("check").checked);
     console.log("newobs");
     console.log($scope.newobs);
     console.log($scope.newobs.boxVal);
-     $scope.newobs.date = $filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
+    $scope.newobs.date = $filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
+    //var date = $filter('date')( $scope.newobs.date );
     console.log($('#Locationval').text());
     console.log(typeof($('#Locationval').text()));
     validation();
@@ -2573,22 +2548,19 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
     function validation(){
       var check =Icheck();
       //if($scope.newobs)
-      if(!$scope.submitDbParams['group_id']){
-        showDailog("Please select category");
-        return;
-      }
+
       if($scope.imgURI.length == 0){
-        showDailog("You must submit atleast one image");
+        showDailog($filter('translate')('atleatOne'));
         return;
       }
       if($scope.newobs.date == null){
-        showDailog("You must enter date");
+        showDailog($filter('translate')('enterDate'));
         return;
       }
       if($scope.newobs.boxVal == false){
         //console.log($scope.newobs['sciName'].length());
         if($scope.newobs['sciName'].length==0 && $scope.newobs['commonName'].length==0){
-          showDailog("Please enter all fields");
+          showDailog($filter('translate')('enterFields'));
           return;
         }
       } else {
@@ -2598,13 +2570,13 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
       }
       console.log($('#Locationval').text());
       $scope.locationAddress = $('#Locationval').text();
-     var uLatLong = LocationService.getCurrentLocation();
+      var uLatLong = LocationService.getCurrentLocation();
       if(uLatLong.longitude == "" || uLatLong.latitude == ""){
                 //showDailog("Unable to get Location, Please edit your location");
-                if($scope.locationAddress == 'Searching'){
+        if($scope.locationAddress == 'Searching'){
          var confirmPopup = $ionicPopup.confirm({
-           title: 'Location',
-           template: 'Unable to get Location, this will be in queue until you enter location.Do u wish to proceed?'
+           title: $filter('translate')('location'),
+           template: $filter('translate')('unableToGetLoc')
          });
          confirmPopup.then(function(res) {
            if(res) {
@@ -2620,7 +2592,7 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                
                 //return;
       }else if($scope.locationAddress == 'Location' || $scope.locationAddress == 'Searching'){
-        showDailog("Please Select location by clicking on GPS button");
+        showDailog($filter('translate')('selectLoc'));
         return;
         /*var confirmPopup = $ionicPopup.confirm({
            title: 'Location',
@@ -2656,27 +2628,30 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
       
     }
 
-    function storeinDb(){
+  function storeinDb(){
        //console.log($state);
      
        var check1 =Icheck();
       $scope.imgName = [];
       //alert("storedb");
       if(check1 == false){
-        showToast($cordovaToast,"Your observation will be submitted when you are next online");
+        showToast($cordovaToast,$filter('translate')('submitNextOnline'));
       } else{
-        showToast($cordovaToast,"Your observation will be submitted shortly");
+        showToast($cordovaToast,$filter('translate')('submitNow'));
       }
       console.log("storedb");
       console.log(db);
         var uLatLong = LocationService.GetUserSelectedLocation();
         console.log("SUBMIT USER"+uLatLong.latitude+" SUBMI "+uLatLong.longitude)
-        $scope.submitDbParams['habitat_id'] = 267835;//267838;
+        $scope.submitDbParams['group_id']   =  10;
+        $scope.submitDbParams['habitat_id'] = 1;
         $scope.submitDbParams['fromDate']   = $scope.newobs.date;
         $scope.submitDbParams['placeName']  = $scope.locationAddress;
         $scope.submitDbParams['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
         $scope.submitDbParams['notes']      = $scope.newobs.notes;
-        $scope.submitDbParams['protocol']   = "MOBILE";
+               $scope.submitDbParams['protocol']   = "MOBILE";
+
+       
         $scope.submitDbParams['imagePath']  = $scope.imgURI;
         //console.log(JSON.stringify($scope.submitDbParams));;
         if($scope.newobs['sciName'].length>0){
@@ -2694,7 +2669,6 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
         }else{
           $scope.submitDbParams['recoId'] = $scope.newobs['recoId']
         }
-        $scope.userGroupId = $scope.userGroupId.toString();
         $scope.submitDbParams['resourceListType'] = "ofObv" ;
         $scope.submitDbParams['agreeTerms'] = "on";
         if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
@@ -2714,6 +2688,7 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
           });
         }else {
           $cordovaSQLite.execute(db, query, ["No Location",JSON.stringify($scope.submitDbParams)]).then(function(res) {
+
               console.log("INSERT ID -> " + res.insertId);
                $state.go("app.observationStatus");
               //alert("transacted");
@@ -2723,11 +2698,215 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
           });
         }
     }
+    function executeRequest(){
+      $state.go("app.home");
+      showToast($cordovaToast,"Your observation will be submitted shortly");
 
-        function showDailog(message){
+      $scope.times = 0;
+      var tokenvar = localStorage.getItem('USER_KEY');
+      var tokenvar1 = JSON.parse(tokenvar);
+      var token = tokenvar1.userKey;
+      var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
+      $scope.count =0;
+      $scope.newImageStr = [];
+      $scope.storeImg = $scope.imgURI;
+      console.log($scope.newobs);
+       var options = new FileUploadOptions();
+       
+        for(var i = 0;i < $scope.imgURI.length; i++){
+          var imageLink = $scope.imgURI[i]['path'] ;
+            options.fileKey = "resources",
+            options.fileName = imageLink.substr(imageLink.lastIndexOf('/')+1),
+            options.chunkedMode = false,
+            options.mimeType = "image/jpg",
+            options.httpMethod = "POST",
+            options.headers =  {
+            "X-Auth-Token":token,
+            "X-AppKey":appkey
+          }
+
+          var ft = new FileTransfer();
+          var uri = encodeURI(ApiEndpoint.url+"/observation/upload_resource?resType=species.participation.Observation");
+          
+          //alert("file");
+          ft.upload(imageLink, uri, win, fail, options);
+        }
+
+      }
+
+          function win(data){
+            //alert(response);
+            //alert(JSON.stringify(response));
+            //var val = JSON.stringify(response);
+            //alert(data.response);
+            //alert(data.response[0]);
+            //console.log(data.response);
+            var parsedData = JSON.parse(data.response);
+            //alert(dat["model"]["observations"]["resources"]);
+            //alert(parsedData["model"]);
+            //alert(val.response["model"]["observations"]["resources"])
+             //alert(jArray);
+             
+
+             var jArray = [];
+             jArray = parsedData["model"]["observations"]["resources"];
+             //alert(jArray[0]);
+
+             if(jArray!=null && jArray.length>0){
+                for(var i=0; i<jArray.length; i++){
+
+                  $scope.newImageStr.push(jArray[i]["fileName"]);
+
+                }
+              $scope.count++;
+             }
+
+             //alert($scope.count);
+
+             if($scope.count == $scope.imgURI.length){
+              //alert("parse");
+              console.log("win parsing "+ $scope.count +" called parse resource");
+              console.log(Object.keys($scope.newImageStr).length);
+              parseResourceDetails();
+             }
+          }
+          function fail(err){
+            $scope.times++;
+            //alert(err);
+            if($scope.times == 1){
+            statusCheck();
+          }
+            console.log("error:fail " + JSON.stringify(err));
+          }
+          
+
+          function parseResourceDetails(){
+            var count1 = 0;
+            console.log("newImgstr" + Object.keys($scope.newImageStr).length);
+            //alert(Object.keys($scope.newImageStr).length);
+            for(var i=0; i<Object.keys($scope.newImageStr).length; i++){
+              //alert()
+              count1++;
+              $scope.submitObsParams["file_"+(i+1)] = $scope.newImageStr[i];
+              $scope.submitObsParams["type_"+(i+1)] = "IMAGE";
+              $scope.submitObsParams["license_"+(i+1)] = "CC_BY";
+              
+              if(count1 == Object.keys($scope.newImageStr).length){
+                //alert("entered");
+                submitObservationFinally();
+              }
+            }
+            //console.log($scope.submitObsParams);
+            
+          }
+
+          function statusCheck(){
+            var sciName;
+            var commonName;
+            var obsNotes;
+            if($scope.newobs['sciName'].length>0){
+               sciName = $scope.newobs['sciName'];
+            } else {
+              sciName = "Unknown";
+            }
+            if($scope.newobs['commonName'].length>0){
+               commonName = $scope.newobs['commonName'];
+            } else {
+              commonName = "";
+            }
+            if($scope.newobs['notes'].length>0){
+               obsNotes = $scope.newobs['notes'];
+            } else {
+              obsNotes = "";
+            }
+            $scope.failedObs = {};
+
+            $scope.failedObs['recoName'] = sciName ;
+            $scope.failedObs['commonName'] = commonName ;
+            //$scope.failedObs['status'] =
+            $scope.failedObs['fromDate'] = $scope.newobs.date;
+            $scope.failedObs['placeName'] = $scope.locationAddress;
+            $scope.failedObs['notes'] = obsNotes ;
+            $scope.failedObs['imagePath'] = $scope.storeImg;//$scope.imgURI;
+
+
+            $scope.failedObs['group_id']   =  10;
+            $scope.failedObs['habitat_id'] = 1;
+            $scope.failedObs['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+            $scope.failedObs['notes']      = $scope.newobs.notes;
+          
+           //console.log(JSON.stringify($scope.submitDbParams));;
+            $scope.failedObs['resourceListType'] = "ofObv" ;
+            $scope.failedObs['agreeTerms'] = "on";
+            if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
+             $scope.failedObs['userGroupsList'] = $scope.userGroupId
+            }
+            //NewObservationService.SetStatus(sciName, commonName, "FAILURE", $scope.newobs.date, $scope.locationAddress, obsNotes, $scope.imgURI);
+             var query = "INSERT INTO observation (status,obslist) VALUES (?,?)";
+              $cordovaSQLite.execute(db, query, ["PENDING",JSON.stringify($scope.failedObs)]).then(function(res) {
+                  console.log("INSERT ID -> " + res.insertId);
+                  //alert("transacted");
+              }, function (err) {
+                //alert(err);
+                  console.error(err);
+              });
+          }
+
+          function submitObservationFinally(){
+            var uLatLong = LocationService.GetUserSelectedLocation();
+            console.log("SUBMIT USER"+uLatLong.latitude+" SUBMI "+uLatLong.longitude)
+            $scope.submitObsParams['group_id']   =  10;//829;//10;
+            $scope.submitObsParams['habitat_id'] =  1;//267835; //1;
+            $scope.submitObsParams['fromDate']   = $scope.newobs.date;
+            $scope.submitObsParams['placeName']  = $scope.locationAddress;
+            $scope.submitObsParams['areas']      =  "POINT("+uLatLong.longitude+" "+uLatLong.latitude+")"
+            $scope.submitObsParams['notes']      = $scope.newobs.notes;
+          
+            if($scope.newobs['sciName'].length>0){
+              $scope.submitObsParams['recoName'] = $scope.newobs['sciName'];
+            }
+            if($scope.newobs['commonName'].length>0){
+              $scope.submitObsParams['commonName'] = $scope.newobs['commonName'];
+            }
+            $scope.submitObsParams['resourceListType'] = "ofObv" ;
+            $scope.submitObsParams['agreeTerms'] = "on";
+            if($scope.userGroupId !=null && $scope.userGroupId.length>0) {
+              $scope.submitObsParams['userGroupsList'] = $scope.userGroupId
+            }
+            console.log($scope.submitObsParams);
+            NewObservationService.SubmitObservation($scope.submitObsParams).then(function(obsResponse){
+              
+              //alert("success" + obsResponse.data.success);
+              if(obsResponse.data.success == false){
+
+               statusCheck();
+              }
+              console.log(obsResponse);
+            },
+            function(err){
+              //alert("Nosuccess");
+              console.log(err);
+               statusCheck();
+            });
+
+          }
+
+       /*$cordovaFileTransfer.upload(ApiEndpoint.url+"/observation/upload_resource?resType=species.participation.Observation", imageLink, options).then(function(result) {
+            console.log("SUCCESS: " + result);
+            console.log(result.status);
+            consoe.log(result.observations.fileName)
+            $scope.resourseResponse = result ;
+        }, function(err) {
+            console.log("ERROR: " + JSON.stringify(err));
+        }, function (progress) {
+            // constant progress updates
+        });*/
+
+    //}
+    function showDailog(message){
 
       $ionicPopup.alert({
-          title: 'ERROR',
+          title: $filter('translate')('error'),
           content: message//'You must submit atleast one image'
         });
     }
@@ -2735,22 +2914,22 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
 
     $scope.userGroup = function(){
       var check =Icheck();
-     //alert("hhh");
-     var groups;
-     var instanceList;
-     $scope.usrGrp =[]
-     if(check == true){
-        groups = UserGroupService.GetUserJoinGroups()
-       console.log(groups);
-        instanceList = groups['data']['model']['observations'];
-       } else {
-         var getGroup =  localStorage.getItem('UserGroupArray');
-         var groups = JSON.parse(getGroup);
-         //alert(groups +" "+ getGroup);
-          //groups = UserGroupService.GetUserJoinGroups()
-         console.log(groups);
-          instanceList = groups['data']['model']['observations'];
-       }
+      //alert("hhh");
+      var groups;
+      var instanceList;
+      $scope.usrGrp =[]
+      if(check == true){
+         groups = UserGroupService.GetUserJoinGroups()
+        console.log(groups);
+         instanceList = groups['data']['model']['observations'];
+      } else {
+        var getGroup =  localStorage.getItem('UserGroupArray');
+        var groups = JSON.parse(getGroup);
+        //alert(groups +" "+ getGroup);
+         //groups = UserGroupService.GetUserJoinGroups()
+        console.log(groups);
+         instanceList = groups['data']['model']['observations'];
+      }
       if(instanceList.length>0){
         for(var i=0; i<instanceList.length; i++){
           $scope.usrGrp.push({"id":instanceList[i].id,"name":instanceList[i].title})
@@ -2763,7 +2942,7 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
                    '<i ng-if="userGroupId.indexOf(usrgrps.id) > -1" class="icon ion-checkmark-round" style="font-size: 18px;right: -7px;"></i>'+
                    '  </ion-item>                             '+
                    '</ion-list>                               ',
-         title: 'Select Groups',
+         title: $filter('translate')('selectgrp'),
          scope: $scope,
          buttons: [
            { text: 'Ok' },
@@ -2772,8 +2951,8 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
 
       } else {
        var lispop = $ionicPopup.alert({
-                title: 'Success',
-                content: 'Join atleast one user groups'
+               title: $filter('translate')('join'),
+               content: $filter('translate')('noGroup')
               });
             
       }
@@ -2801,29 +2980,28 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
       if(addToArray){
         $scope.userGroupId.push(id);
       }
-       //$('#uGroupText').text($scope.userGroupId.length)
-       $scope.usergroupLength = $scope.userGroupId.length;
+       $('#uGroupText').text($scope.userGroupId.length)
       console.log($scope.userGroupId);
     }
 
   $scope.addMedia = function() {
 
-    if($scope.imgURI.length == 10){
-      showDailog("Maximum Images reached");
-      return;
-    }
-    $scope.hideSheet = $ionicActionSheet.show({
-      buttons: [
-        { text: 'Take photo' },
-        { text: 'Photo from library' }
-      ],
-      titleText: 'Add images',
-      cancelText: 'Cancel',
-      buttonClicked: function(index) {
-        $scope.addImage(index);
-      }
-    });
-  }
+     if($scope.imgURI.length == 10){
+            showDailog($filter('translate')('maxReached'));
+            return;
+          }
+          $scope.hideSheet = $ionicActionSheet.show({
+            buttons: [
+              { text: $filter('translate')('takePhoto') },
+              { text: $filter('translate')('fromLib') }
+            ],
+            titleText: $filter('translate')('addimg'),
+            cancelText: $filter('translate')('cancel'),
+            buttonClicked: function(index) {
+              $scope.addImage(index);
+            }
+          });
+        }
  var z=0;
   $scope.addImage = function(type) {
     
@@ -2842,11 +3020,12 @@ appne.controller('NewObservationCtrl', function($scope,$window,$route,$state,$lo
         openAlbum();
         break;
     }
-
 }
 
   function openCamera(){
-  
+
+
+
 var options = {
     destinationType: Camera.DestinationType.FILE_URI,
       sourceType: Camera.PictureSourceType.CAMERA,
@@ -2855,71 +3034,34 @@ var options = {
       popoverOptions: CameraPopoverOptions,
       saveToPhotoAlbum: true
   };
+
+  console.log(options);
   $cordovaCamera.getPicture(options).then(function(imageUrl) {
-     // var link =  "data:image/jpeg;base64," +imageUrl;
-      /*var link = imageUrl;
-      z++;
-      $scope.imgURI.push({"id":z,"path":link});
-      console.log($scope.imgURI);*/
-      //console.log($scope.imageLink);
-      z++;
-      $("#imgContent").show();
+      
+                     $("#imgContent").show();
+
       onImageSuccess(imageUrl);
+      }, function(err) {
+                // An error occured. Show a message to the user
+          });
+}
 
-       function onImageSuccess(fileURI) {
-          createFileEntry(fileURI);
-       }
-       
-       function createFileEntry(fileURI) {
-          window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
-       }
-       
-       // 5
-       function copyFile(fileEntry) {
-        //alert(fileEntry);
-         var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
-         var newName = makeid() + name;
-         //alert(newName);
-         window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
-                   //alert(fileSystem2);
-
-         fileEntry.copyTo(fileSystem2,newName,onCopySuccess,fail);
-         },
-         fail);
-       }
-       
-       // 6
-       function onCopySuccess(entry) {
-         $scope.$apply(function () {
-          //alert(urlForImage(entry.nativeURL));
-          var justId = "meta"+z;
-         $scope.imgURI.push({"id":z,"path":urlForImage(entry.nativeURL), "valId":justId,"license":"CC BY","licImgg":"cc-by.png"});
-         data(justId);
-         });
-       }
-     }, function(err) {
-            // An error occured. Show a message to the user
-      });
-     }
-
-var countValue = 0;
-     function openAlbum(){
+function openAlbum(){
       $scope.imagesSelected = 0;
 
       window.imagePicker.getPictures(
           function(results) {
                 $("#imgContent").show();
                 $scope.imagesSelected = results.length;
-                $cordovaToast.show("Processing,Please wait", "short", "bottom").then(function(success) {
+                $cordovaToast.show($filter('translate')('processingWait'), "short", "bottom").then(function(success) {
                     console.log("The toast was shown");
                 });
               for (var i = 0; i < results.length; i++) {
-                                
-                if($scope.imgURI.length == 10){
-                  showToast($cordovaToast,"Maximum Images reached");
+                 if($scope.imgURI.length == 10){
+                  showToast($cordovaToast,$filter('translate')('maxReached'));
                   return;
                 }else{
-                 onAlbumSuccess(results[i]);
+                 onImageSuccess(results[i]);
                 }
               }
           }, function (error) {
@@ -2932,123 +3074,46 @@ var countValue = 0;
 
      }
 
-     function onAlbumSuccess(entry) {
-                z++;
-                countValue++;
+     
+ 
+       function onImageSuccess(fileURI) {
+          createFileEntry(fileURI);
+       }
+       
+       function createFileEntry(fileURI) {
+          window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
+       }
+       
+       // 5
+       function copyFile(fileEntry) {
+         var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
+         var newName = makeid() + name;
+         
+         window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
+         fileEntry.copyTo(fileSystem2,newName,onCopySuccess,fail);
+         },
+         fail);
+       }
+       
+       // 6
+       function onCopySuccess(entry) {
+              z++;
+              if($scope.imgURI.length >= 10){
+                  showToast($cordovaToast,"Maximum Images reached");
+                  return;
+                }else{
 
          $scope.$apply(function () {
           //alert(urlForImage(entry.nativeURL));
-          var justId = "meta"+z;
-          //$scope.submitDbParams["license_"+z]="CC BY";
-          $scope.imgURI.push({"id":z,"path":entry, "valId":justId,"license":"CC BY","licImgg":"cc-by.png"});
-          if(countValue ==1){
-             data(justId);
-           }else if(countValue == $scope.imagesSelected){
-            countValue = 0;
-           }
-           if($scope.imagesSelected == 1){
-            countValue = 0;
+                     //   alert($scope.imgURI.length);
 
-           }
+         $scope.imgURI.push({"id":z,"path":urlForImage(entry.nativeURL),"license":"CC BY","licImgg":"cc-by.png"});
          });
-       }
-
-        function printData(date, text){
-          
-          $scope.$apply(function () {
-            //alert(text);
-                  $scope.newobs.date = date;
-                  
-                });
         }
-       function data(valueId){
-        $timeout(function(){
-        var img_url=document.getElementById(valueId);
-         var confirmPopup = $ionicPopup.confirm({
-          title: 'Import Meta Data',
-          template: 'Do you want to set the date,time and Location of this observation from photo\'s metadata' 
-        });
-         confirmPopup.then(function(result) {
-
-            if(result) {
-           
-            // alert(img_url);
-                EXIF.getData(img_url, function() {
-                //alert(EXIF.pretty(this));
-                //alert(typeof(EXIF.pretty(this)));
-                if(EXIF.pretty(this) != ''){
-                  
-                //alert(EXIF.getTag(this, 'DateTime'));
-                var p;
-                //alert("ssd  "+typeof(EXIF.getTag(this, 'DateTimeOriginal')));
-                if(EXIF.getTag(this, 'DateTime')!= undefined){
-                  //alert('unideee');
-                   p = EXIF.getTag(this, 'DateTime');
-                } else {
-                  //alert('unde');
-                  p = EXIF.getTag(this, 'DateTimeOriginal');
-                }
-                var s = p.split(' ')[0].replace(':','/');
-                var index = 7;
-                s = s.substr(0, index) + '/' + s.substr(index + 1);
-                //alert(s);
-                var metaLocation = '';
-                if(EXIF.getTag(this, 'GPSLongitude') != undefined || EXIF.getTag(this, 'GPSLatitude') != undefined){
-                  var check =Icheck();
-
-                  var str = String(EXIF.getTag(this, 'GPSLongitude'));
-                   var metaLong = str.split(",")
-                   var str1 = String(EXIF.getTag(this, 'GPSLatitude'))
-                   var metaLat = str1.split(",")
-                   var latRef = EXIF.getTag(this, 'GPSLatitudeRef') ; 
-                   var lonRef = EXIF.getTag(this, 'GPSLongitudeRef ') ; 
-                    metaLat = (Number(metaLat[0]) + Number(metaLat[1]/60) + Number(metaLat[2]/3600)) * (latRef == "N" ? 1 : -1);  
-                    metaLong = (Number(metaLong[0]) + Number(metaLong[1]/60) + Number(metaLong[2]/3600)) * (lonRef == "W" ? -1 : 1);
-
-                   //alert(metaLat +" "+metaLong);
-
-                  if(check ==true){
-                   var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+metaLat+","+metaLong;
-                   //alert(code);
-                   $http.get(code).success(function(dataval){
-                      //console.log(dataval.results[0]);
-                      //alert(JSON.stringify(dataval));
-                      var texture =  dataval.results[0]["formatted_address"];
-                      //alert(texture +" "+typeof(dataval.results[0]["formatted_address"]));
-                     // printData(s,texture);
-                     
-                            $scope.newobs.date = reverseStr(s);
-                            var setUser1 = {"H":metaLat, "L":metaLong}
-                            LocationService.SetUserSelectedLocation( setUser1);
-                              $('#Locationval').text(texture);
-                      
-                    }).error(function(data){
-                         //alert(JSON.stringify(data));
-                    });
-                  }else {
-                    var texting = "Lattitude:"+metaLat+"longitude"+metaLong;
-                      //printData(s, texting);
-                    
-                            $scope.newobs.date = reverseStr(s);
-                            var setUser = {"H":metaLat, "L":metaLong}
-                            LocationService.SetUserSelectedLocation( setUser);
-                              $('#Locationval').text(texting);
-                   
-                  }
-                }else {
-                
-                printData(reverseStr(s), "");
-              }
-              }
-                //alert("Longitude ="+EXIF.getTag(this, 'GPSLongitude'));
-                });
-            }
-        });
-              
-          },500);
        }
+       
        function fail(error) {
-         // alert("fail: " + JSON.stringify(error));
+          console.log("fail: " + error.code);
        }
        
        function makeid() {
@@ -3061,18 +3126,6 @@ var countValue = 0;
          return text;
        }
 
-
-
-
-
-
-
-  //}, function(err) {
-            // An error occured. Show a message to the user
-    //  });
-
-
-
   function urlForImage(imageName) {
     //alert($scope.imgURI.length);
     console.log(imageName);
@@ -3084,28 +3137,18 @@ var countValue = 0;
   }
 
 /*var data = LocationService.getCurrentLocation()//.then(function(data){
-  //alert(data['latitude']);
-    var interCheck = Icheck();
-    if(interCheck==true){
     console.log(data);
       var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data.latitude+","+data.longitude;
-      var loc = {'H':data.latitude , 'L':data.longitude};
+      var loc = {'G':data.latitude , 'K':data.longitude};
             LocationService.SetUserSelectedLocation(loc);
       $http.get(code).success(function(dataval){
             //console.log(dataval.results[0]);
             $("#Locationval").text(dataval.results[0]["formatted_address"]);
 
-          });
-    }else{
-      $("#Locationval").text("Lattitude:"+data.latitude+" longitude"+data.longitude);
-      var loc = {'H':data.latitude , 'L':data.longitude};
-      LocationService.SetUserSelectedLocation(loc);
-    }*/
-    
-  
+          });*/
+
 $scope.removeImage = function(id){
 //alert($scope.imgURI.length);
-//delete $scope.submitDbParams["license_"+id];
   for(var i=0; i<$scope.imgURI.length;i++){
     if($scope.imgURI[i]['id']==id){
       $scope.imgURI.splice(i,1);
@@ -3117,29 +3160,15 @@ $scope.removeImage = function(id){
 
 //alert(id);
 }
-/*$scope.showLicense = function(){
-  $scope.licensePopup = $ionicPopup.show({
-         template: '<ion-list >                                '+
-                   '  <ion-item class="item " ng-repeat="img in imageLicense"  style="background:url("img/{{img.imageName}}") no-repeat" ng-click="selectedLicense({{img.id}});" > {{img.imageName}} '+
-                   '  </ion-item>                             '+
-                   
-                   '</ion-list>                               ',
-         title: 'Choose License',
-         scope: $scope,
-         buttons: [
-           { text: 'cancel' },
-         ]
-       }); 
-}*/
 $scope.showLicense = function(imageNumber){
   $scope.imageVal = imageNumber;
   $scope.licensePopup = $ionicPopup.show({
          template: '  <img ng-repeat="img in imageLicense" style=" padding: 5px 5px 5px 5px;" ng-src="img/{{img.imageName}}" ng-click="selectedLicense(img.id, img.imageName);" > '+
                    '  </img>   ',
-         title: 'Choose License',
+         title: $filter('translate')('chooseLicense'),
          scope: $scope,
          buttons: [
-           { text: 'cancel' },
+           { text: $filter('translate')('canc') },
          ]
        }); 
 }
@@ -3156,121 +3185,223 @@ $scope.selectedLicense = function(licenseId, imgName){
   }
 
 }
-
 $scope.gps = function(){
   
 
    $scope.gpsPopup = $ionicPopup.show({
          template: '<ion-list class="item-icon-right">                                '+
                    '  <ion-item class="item "  ng-click="currentGPS(2);" > '+
-                   '    Get Current Location                             '+
+                   '    {{"getLoc" | translate}}                             '+
                    '  </ion-item>                             '+
                    '  <ion-item class="item "  ng-click="editGPS();" > '+
-                   '   Edit Location                             '+
+                   '   {{"editLoc" | translate}}                             '+
                    '  </ion-item>                             '+
                    '</ion-list>                               ',
-         title: 'Edit Location',
+         title: $filter('translate')('editLoc') ,
          scope: $scope,
          buttons: [
-           { text: 'cancel' },
+           { text: $filter('translate')('canc')  },
          ]
        }); 
   /**/
 }
 $scope.currentGPS = function(valuee){
-
-  
-  if(valuee == 2){
-    $scope.gpsPopup.close();
-  }
-   // alert("cald");
-   cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
+ if(valuee == 2){
+   $scope.gpsPopup.close();
+ }
+  // alert("cald");
+cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
+  //alert(enabled);
     if(enabled == 1){
+      $ionicPlatform.ready(function(){
       onGPS($cordovaGeolocation,LocationService,$ionicPopup);
+      });
     } else {
 
-      var settingName = "location_source";
+      //var settingName = "location_source";
     
   var confirmPopup = $ionicPopup.alert({
           title: 'GPS',
-          template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
+          template: $filter('translate')('noLocation')
         });
-         confirmPopup.then(function(result) {
+         /*confirmPopup.then(function(result) {
 
                      cordova.plugins.settings.openSetting(settingName, success,failure);
-          });
+          });*/
 
     }
 
 }, function(error){
-    //alert("The following error occurred: "+error);
+    alert("The following error occurred: "+error);
 });
      $("#Locationval").text("Searching");
 
-  $timeout(function() {
-    var data1 = LocationService.getCurrentLocation();
-    var check =Icheck();
-    if(check ==true && data1.latitude != ''){
-    //.then(function(data){
-    //alert(JSON.stringify(data1));
-      var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data1.latitude+","+data1.longitude;
-      var loc = {'H':data1.latitude , 'L':data1.longitude};
-            LocationService.SetUserSelectedLocation(loc);
-      $http.get(code).success(function(dataval){
-            //console.log(dataval.results[0]);
-            $("#Locationval").text(dataval.results[0]["formatted_address"]);
-            LocationService.SetCurrentAdd(dataval.results[0]["formatted_address"])
-            //$scope.newobs.location = dataval.results[0]["formatted_address"];
 
-          });
-    }else if(check ==false && data1.latitude != '') {
-      $("#Locationval").text("Lattitude:"+data1.latitude+"longitude"+data1.longitude);
-      var loc1 = {'H':data1.latitude , 'L':data1.longitude};
-      LocationService.SetUserSelectedLocation(loc1);
-    }
-  }, 1000);
-  
+ $timeout(function() {
+   var data1 = LocationService.getCurrentLocation();
+   var check =Icheck();
+   if(check ==true && data1.latitude != ''){
+   //.then(function(data){
+   //alert(JSON.stringify(data1));
+     var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data1.latitude+","+data1.longitude;
+     var loc = {'H':data1.latitude , 'L':data1.longitude};
+           LocationService.SetUserSelectedLocation(loc);
+     $http.get(code).success(function(dataval){
+           //console.log(dataval.results[0]);
+           $("#Locationval").text(dataval.results[0]["formatted_address"]);
+          LocationService.SetCurrentAdd(dataval.results[0]["formatted_address"])
+           //$scope.newobs.location = dataval.results[0]["formatted_address"];
+
+         });
+   }else if(check ==false && data1.latitude != '') {
+     $("#Locationval").text("Lattitude:"+data1.latitude+"longitude"+data1.longitude);
+     var loc1 = {'H':data1.latitude , 'L':data1.longitude};
+     LocationService.SetUserSelectedLocation(loc1);
+   }
+ }, 5000);
+ 
 }
 $scope.currentGPS(1);
 $scope.editGPS = function(){
- $scope.gpsPopup.close();
-  var inter = Icheck();
-  //alert(inter);
-    if(inter == false){
-      showToast($cordovaToast,"No Internet");
-      return;
-    }else {
-      $('ion-nav-bar').addClass('hide');
-      $state.go("app.gps");
-    }
+  $scope.gpsPopup.close();
+   var inter = Icheck();
+     if(inter == false){
+      showToast($cordovaToast,$filter('translate')('noInternet'));
+       return;
+     }else {
+       $('ion-nav-bar').addClass('hide');
+       $state.go("app.gps");
+     }
 }
- $interval(function(){
-        var check =Icheck();
-        //alert($scope.newobs.location);
-        //console.log($('#Locationval').text().substr(0,9));
-            var data1 = LocationService.getCurrentLocation();
-        if(data1.latitude == "" && data1.longitude == ""){
-                      var dataUser = LocationService.GetUserSelectedLocation();
+
+  $interval(function(){
+       var data1 = LocationService.getCurrentLocation();
+
+    var check =Icheck();
+    if(data1.latitude == "" && data1.longitude == ""){
+           var dataUser = LocationService.GetUserSelectedLocation();
         if(dataUser.latitude == "" && dataUser.longitude == ""){
           $scope.currentGPS(1);
         }
         }
-        if($('#Locationval').text().substr(0,9) == "Lattitude" || $('#Locationval').text() == "Location" || $('#Locationval').text() == "Searching" && check == true){
-             var data1 = LocationService.GetUserSelectedLocation();
-             //($scope.newobs['location'].substr(0,9));
-         var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data1.latitude+","+data1.longitude;
+    if($('#Locationval').text().substr(0,9) == "Lattitude" || $('#Locationval').text() == "Location" && check == true){
+         var data1 = LocationService.GetUserSelectedLocation();
 
-             $http.get(code).success(function(dataval){
-               //console.log(dataval.results[0]);
-               $("#Locationval").text(dataval.results[0]["formatted_address"]);
-               //$scope.newobs.location = dataval.results[0]["formatted_address"];
+     var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data1.latitude+","+data1.longitude;
 
-             });
-        }
-   }, 2000);
+         $http.get(code).success(function(dataval){
+           //console.log(dataval.results[0]);
+           $("#Locationval").text(dataval.results[0]["formatted_address"]);
+           //$scope.newobs.location = dataval.results[0]["formatted_address"];
+
+         });
+    }
+  }, 2000);
 
 });
 
+
+
+
+appne.controller('SettingsController', function($scope, $state, LocationService, $filter, $ionicPopup, $translate) {
+  //alert("hi");
+  var setStorage = localStorage.getItem('SETTINGS');
+      var setValues = JSON.parse(setStorage);
+      var wifiSettings = setValues.wifiSetting;
+      //alert(token);
+      var manualUploads = setValues.manualUpload;
+      var settingLang = localStorage.getItem('LangSETTINGS');
+       var langValues = JSON.parse(settingLang);
+      var languageChange = langValues.languageSetting;
+      //alert(wifiSettings +", "+manualUploads);
+                console.log(setValues)
+
+  $scope.settingsList = [
+    { text: $filter('translate')('wifiUpload'), subtext: $filter('translate')('onlyWifi'), checked: wifiSettings },
+    { text: $filter('translate')('manUpload'), subtext: $filter('translate')('noWifi') , checked: manualUploads },
+    {text: $filter('translate')('langText'), subtext: $filter('translate')('langDetail') , checked: languageChange}
+  ];
+  
+  $scope.setChange = function(){
+    //alert($scope.settingsList[0].checked);
+    //alert($scope.settingsList[1].checked);
+    console.log(languageChange)
+        console.log($scope.settingsList)
+
+    setValues.wifiSetting = $scope.settingsList[0].checked ;
+    setValues.manualUpload = $scope.settingsList[1].checked ;
+    localStorage.setItem('SETTINGS',JSON.stringify(setValues));
+
+    if(languageChange == false){
+     if($scope.settingsList[2].checked == true){
+           var confirmPopup = $ionicPopup.confirm({
+             title: $filter('translate')('changeLang'),
+             template: $filter('translate')('detailLang')
+           });
+
+           confirmPopup.then(function(res) {
+             if(res) {
+              languageChange = true;
+                langValues.languageSetting = $scope.settingsList[2].checked ;
+                localStorage.setItem('LangSETTINGS',JSON.stringify(langValues));
+                $translate.use('fr').then(function(data) {
+                  //alert(data);
+                    console.log("SUCCESS1 -> " + data);
+                }, function(error) {
+                    console.log("ERROR 1-> " + error);
+                });
+      
+             } else {
+              langValues.languageSetting = false ;
+              localStorage.setItem('LangSETTINGS',JSON.stringify(langValues));
+                 $scope.settingsList[2].checked = false;
+                  $translate.use('en').then(function(data) {
+                  //alert(data);
+                    console.log("SUCCESS2 -> " + data);
+                  }, function(error) {
+                      console.log("ERROR2 -> " + error);
+                  });
+             }
+           });
+
+        }else {
+            languageChange = false;
+           langValues.languageSetting = false ;
+          localStorage.setItem('LangSETTINGS',JSON.stringify(langValues));
+           $translate.use('en').then(function(data) {
+                  //alert(data);
+             console.log("SUCCESS3 -> " + data);
+            }, function(error) {
+                console.log("ERROR3 -> " + error);
+            });
+        }
+    }else if($scope.settingsList[2].checked == false){
+       languageChange = false;
+           langValues.languageSetting = false ;
+           localStorage.setItem('LangSETTINGS',JSON.stringify(langValues));
+
+          console.log(setValues)
+           $translate.use('en').then(function(data) {
+                  //alert(data);
+             console.log("SUCCESS4 -> " + data);
+            }, function(error) {
+                console.log("ERROR4 -> " + error);
+            });
+    }
+
+  }
+  });
+
+appne.controller('aboutController', function($scope,$location,$ionicSideMenuDelegate){
+       var obsId = $location.path().split("/")[3];
+       if(obsId == 2){
+         $scope.showMenu = false;
+         $ionicSideMenuDelegate.canDragContent(false);
+       }else {
+         $scope.showMenu = true;
+       }
+
+});
 
 appne.controller('ViewOnMapController', function($scope, $state, BrowseService) {
 
@@ -3342,11 +3473,11 @@ var myOptions = {
 
 });
 
-appne.controller('GPSController', function($scope, $state,$http, LocationService, $ionicPlatform,$cordovaSQLite,$location,$timeout,$cordovaToast) {
+appne.controller('GPSController', function($scope, $state,$http, $timeout, LocationService,$location,$cordovaSQLite) {
 
 //alert($location.path());
-
 $scope.myScopeVar = LocationService.GetCurrentAdd();
+
 setTimeout(function(){
       if($('button').hasClass('hide')){
         //alert('came');
@@ -3354,21 +3485,19 @@ setTimeout(function(){
         //$('ion-view').css('padding-top','44px');
         //$('ion-content').css('margin-top','43px');
       }else if($('ion-nav-bar').hasClass('hide')){
-       //alert('came');
-       $('ion-nav-bar').removeClass('hide');
-       //$('ion-view').css('padding-top','44px');
-       //$('ion-content').css('margin-top','43px');
-     }
-       //$('ion-view').css('padding-top','0');
-       //$('ion-content').css('margin-top','-1px');
-     
-   },100);
- var check = Icheck();
- //if(check==true){
-    var data1 = LocationService.getCurrentLocation();
+        //alert('came');
+        $('ion-nav-bar').removeClass('hide');
+        //$('ion-view').css('padding-top','44px');
+        //$('ion-content').css('margin-top','43px');
+      }
+        //$('ion-view').css('padding-top','0');
+        //$('ion-content').css('margin-top','-1px');
+      
+    },100);
+var data1 = LocationService.getCurrentLocation();
  var myLatlng = new google.maps.LatLng(data1.latitude, data1.longitude);
-  
-  var mp;
+ //var myLatlng = new google.maps.LatLng(11.9384867, 79.8352657);
+ 
         var mapOptions = {
             center: myLatlng,
             zoom: 16,
@@ -3376,8 +3505,10 @@ setTimeout(function(){
         };
  
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-       /* navigator.geolocation.getCurrentPosition(function(pos) {
+        //alert(map);
+        changeMarker();
+        var mp;
+        /*navigator.geolocation.getCurrentPosition(function(pos) {
           $scope.mapval = {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude
@@ -3394,25 +3525,26 @@ setTimeout(function(){
                 draggable:true
             });
               
-              myLocation.bindTo('position',map,'center');*/
-              changeMarker();
-           // }
-       // });
+              myLocation.bindTo('position',map,'center');
+              changeMarker()
+        });*/
 //alert("gps");
-       
+        
         function changeMarker(){
+          //alert('mp');
           $('<div/>').addClass('centerMarker myMarker').appendTo(map.getDiv())
            mp = $('.centerMarker');
           mp.data('win',new google.maps.InfoWindow({content:'this is the center'}));
           mp.data('win').bindTo('position',map,'center');
+          //alert(mp);
           //console.log(loc);
           google.maps.event.addListener(mp.data('win'), 'position_changed', function(){
               //console.log('Current Latitude:',evt.latLng.lat(),'Current Longitude:',evt.latLng.lng());
-              console.log(mp.data('win').getPosition());
-              /*var locations = mp.data('win').getPosition();
-              console.log(locations);
-              var p = [];
-              angular.forEach(locations, function(value, key){ 
+              console.log(mp.data('win').getPosition().lat());
+              //var locations = {mp.data('win').getPosition();
+              //console.log(locations);
+              //var p = [];
+              /*angular.forEach(locations, function(value, key){ 
                 
                 p.push(value); 
               });*/
@@ -3422,7 +3554,6 @@ setTimeout(function(){
               updating("texttop");
               });
         }
-
         $(function () {
             $(document).on('tap', '#texttop', function() {
               //alert($scope.newobs.boxVal);
@@ -3445,7 +3576,7 @@ setTimeout(function(){
               //alert($scope.newobs.boxVal);
               $timeout(function(){
                 var geocoder = new google.maps.Geocoder();
-               // alert($("#texttop").val());
+                //alert($("#texttop").val());
                 geocoder.geocode({'address': $("#texttop").val()}, function(results, status) {
                   if (status === google.maps.GeocoderStatus.OK) {
                     mp = $('.myMarker');
@@ -3466,15 +3597,13 @@ setTimeout(function(){
             
             });
         });
-         
+
+
+ 
         $scope.doSomething = function(){
           //alert($('#checking').html());
           updating("Locationval");
           $state.go("app.newObservation");
-        }
-        $scope.goStatus = function(){
-          $state.go('app.observationStatus');
-
         }
         $scope.registerLocation = function(){
           updating("Locationvalue1");
@@ -3486,7 +3615,7 @@ setTimeout(function(){
           $state.go('newUser');
 
         }
-        
+
         $scope.statusLocation = function(){
           //alert('came')
           $scope.dbId = $location.path().split("/")[3];
@@ -3506,6 +3635,7 @@ setTimeout(function(){
         
         });
         }
+
          $scope.getLocation = function(){
           //console.log($('#Locationval').html());
           var data = LocationService.GetUserSelectedLocation()//.then(function(data){
@@ -3517,10 +3647,13 @@ setTimeout(function(){
               
                
                 LocationService.SetUserSelectedLocAdd(dataval.results[0]["formatted_address"]);
-              $state.go("app.editObservation",{},{cache:true});
+              $state.go("app.editDetails",{},{cache:true});
             });
           
-         
+        }
+        $scope.goStatus = function(){
+         $state.go('app.observationStatus');
+
         }
 
         function updating(id){
@@ -3529,41 +3662,33 @@ setTimeout(function(){
       var code="https://maps.googleapis.com/maps/api/geocode/json?latlng="+data.latitude+","+data.longitude;
       
       $http.get(code).success(function(dataval){
-            console.log(dataval);
+            //console.log(dataval.results[0]);
             if(id == 1){
               //alert("came");
               LocationService.SetUserSelectedLocAdd(dataval.results[0]["formatted_address"]);
             }else{
             $("#"+id).text(dataval.results[0]["formatted_address"])
-            $("#"+id).val(dataval.results[0]["formatted_address"])
-
-            }
+            $("#"+id).val(dataval.results[0]["formatted_address"])            }
           });
         }
 
 });
 
-
-     
-
 function onGPS($cordovaGeolocation,LocationService,$ionicPopup){
 
-//alert('came');
-var posOptions = {timeout: 3000, maximumAge: 90000, enableHighAccuracy: false};
-  $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
-      var lat  = position.coords.latitude;
-      var lng = position.coords.longitude;
-      //alert(lng);
-      LocationService.setCurrentLocation(lat,lng);
-      var loc = {"H":position.coords.latitude,"L": position.coords.longitude};
-       LocationService.SetUserSelectedLocation(loc);
-    }, function(data) {
-      // error
-      //alert(data.message);
-      //var options = {enableHighAccuracy:true};
-
-navigator.geolocation.getCurrentPosition(onSuccess, onError, {timeout: 2000, enableHighAccuracy: true});
-function onSuccess(position){
+  //alert('came');
+  var posOptions = {timeout: 20000, maximumAge: 0, enableHighAccuracy: true};
+   $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+       var lat  = position.coords.latitude;
+       var lng = position.coords.longitude;
+       //alert(lng);
+       LocationService.setCurrentLocation(lat,lng);
+       var loc = {"H":position.coords.latitude,"L": position.coords.longitude};
+        LocationService.SetUserSelectedLocation(loc);
+     }, function(data) {
+      //alert(JSON.stringify(data));
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, {timeout: 2000, enableHighAccuracy: true});
+      function onSuccess(position){
        // alert('succ');
         //alert(JSON.stringify(position));
         var lat  = position.coords.latitude;
@@ -3574,7 +3699,7 @@ function onSuccess(position){
     
       }
        function onError(error){
- // alert("err");
+      //alert(JSON.stringify(error));
     //alert(error.message);
     //var settingName = "location_source";
      /* var alertPopup = $ionicPopup.alert({
@@ -3602,113 +3727,51 @@ function onSuccess(position){
           });*/
 
 }
-
-
-      /*var settingName = "location_source";
-      var alertPopup = $ionicPopup.alert({
-            title: 'GPS',
-            content: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"//'You must submit atleast one image'
-          });
-
-       alertPopup.then(function(res) {
-         cordova.plugins.settings.openSetting(settingName, success,failure);
-       });*/
-        
-      
-      //alert(data);
-    });
+     });
 }
-  
+ 
 
 
-
-
-
-
-
-
-appne.controller('HomeController',[ '$scope', '$state', '$window', '$timeout', '$http', 'BrowseService','LocationService', '$ionicSideMenuDelegate','UserGroupService','$cordovaSQLite', '$ionicPlatform', 'ApiEndpoint', 'NewObservationService' ,'$filter' , '$ionicHistory' , '$cordovaGeolocation' , '$ionicPopup','$cordovaToast',function($scope,$state,$window,$timeout,$http,BrowseService,LocationService,$ionicSideMenuDelegate, UserGroupService, $cordovaSQLite, $ionicPlatform, ApiEndpoint, NewObservationService,$filter,$ionicHistory,$cordovaGeolocation,$ionicPopup,$cordovaToast){
+appne.controller('HomeController',[ '$scope', '$state', '$window', '$timeout', '$http', 'BrowseService','LocationService', '$ionicSideMenuDelegate','UserGroupService','$cordovaSQLite', '$ionicPlatform', 'ApiEndpoint', 'NewObservationService' ,'$filter' , '$ionicHistory' , '$cordovaToast', '$cordovaProgress' , '$cordovaGeolocation', '$ionicPopup',function($scope,$state,$window,$timeout,$http,BrowseService,LocationService,$ionicSideMenuDelegate, UserGroupService, $cordovaSQLite, $ionicPlatform, ApiEndpoint, NewObservationService,$filter,$ionicHistory,$cordovaToast,$cordovaProgress,$cordovaGeolocation,$ionicPopup){
   
 //$ionicSideMenuDelegate.canDragContent(true);
 //$cordovaSQLite.deleteDB("observationQueue.db");
  //$ionicPlatform.on('online', pendingObservation);
 //alert($ionicPlatform.on('online', pendingObservation, false));
   var check ;
-  var editCheck = 0; 
-  //$ionicHistory.clearCache();
   var wCheck ;
-
-  setTimeout(function(){
-      if($('ion-nav-bar').hasClass('hide')){
-        //alert('came');
-        $('ion-nav-bar').removeClass('hide');
-        //$('ion-view').css('padding-top','44px');
-        //$('ion-content').css('margin-top','43px');
-      }
-    },100);
-
-var setStorage = localStorage.getItem('SETTINGS');
+  var editCheck = 0; 
+  var setStorage = localStorage.getItem('SETTINGS');
       var setValues = JSON.parse(setStorage);
       var wifiSettings = setValues.wifiSetting;
       //alert(token);
       var manualUploads = setValues.manualUpload;
-
       var setHome = localStorage.getItem('Home');
       var executeVal = JSON.parse(setHome);
       var execObs = executeVal.ExecuteVal;
-
-      $scope.speciesGroups = [{"id":829,"name":"All"},{"id":841,"name":"Mammals"},{"id":837,"name":"Birds"},{"id":845,"name":"Fish"},{"id":835,"name":"Amphibians"},{"id":843,"name":"Reptiles"},{"id":856,"name":"Molluscs"},{"id":839,"name":"Arthropods"},{"id":833,"name":"Plants"},{"id":831,"name":"Fungi"},{"id":830,"name":"Others"}];
-
+  //$ionicHistory.clearCache();
   $scope.goNewObs = function(){
-      cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
-                  //alert(enabled);
-            if(enabled){
-                $ionicHistory.clearCache().then(function(){ 
-                  $state.go('app.newObservation');
-                })  
-              } else {
+    $ionicHistory.clearCache().then(function(){ 
+      $state.go('app.newObservation');
+    })
+       /*var tokenVal = localStorage.getItem('USER_KEY');
+      var tokenVar = JSON.parse(tokenVal);
+      var countVal = tokenVar.nId;
+        if(countVal==0){
+          tokenVar.nId = 1;
+          localStorage.setItem('USER_KEY',JSON.stringify(tokenVar));
+          $state.go("app.newObservation");
+        }else{
+              $state.go("app.newObservation",null,{reload:true});
 
-              var settingName = "location_source";
-            
-          var confirmPopup = $ionicPopup.alert({
-                  title: 'GPS',
-                  template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
-                });
-                 confirmPopup.then(function(result) {
-
-                             cordova.plugins.settings.openSetting(settingName, success,failure);
-                  });
-
-            }
-
-        }, function(error){
-           // alert("The following error occurred: "+error);
-        }); 
+        }*/
   }
-   $scope.goBrowseObs = function(){
-    $scope.listPopup = $ionicPopup.show({
-         template: '<ion-list class="item-icon-right">                                '+
-                   '  <ion-item class="item " id="uGroup{{usrgrps.id}}" ng-repeat="usrgrps in speciesGroups " ng-click="goToBrowse({{usrgrps.id}});" > '+
-                   '    {{usrgrps.name}}                             '+
-                   '  </ion-item>                             '+
-                   '</ion-list>                               ',
-         title: 'Select Groups',
-         scope: $scope,
-         buttons: [
-           { text: 'Cancel' },
-         ]
-       });  
-   
-   }
-
-   $scope.goToBrowse = function(browseId){
-     $scope.listPopup.close();
-      BrowseService.setSpeciesGroupID(browseId);
-     $ionicHistory.clearCache().then(function(){ 
-          $state.go('app.browse');
-        })
-   }
-   $scope.deleteMultiple = function(obsId, resource){
+  $scope.goBrowseObs = function(){
+    $ionicHistory.clearCache().then(function(){ 
+      $state.go('app.browse');
+    })
+  }
+  $scope.deleteMultiple = function(obsId, resource){
     //alert(resource);
     var tokenvar = localStorage.getItem('USER_KEY');
     var tokenvar1 = JSON.parse(tokenvar);
@@ -3767,10 +3830,9 @@ var setStorage = localStorage.getItem('SETTINGS');
     });
     
   }*/
-   observationStatusController($scope, NewObservationService, $cordovaSQLite);
-
-$ionicPlatform.ready(function () {
-   var setvar3 = localStorage.getItem('countvariables');
+  observationStatusController($scope, NewObservationService, $cordovaSQLite, $filter);
+   $ionicPlatform.ready(function() {
+    var setvar3 = localStorage.getItem('countvariables');
    var getVar3 = JSON.parse(setvar3);
     check = Icheck();
     wCheck = wifiCheck();
@@ -3791,39 +3853,40 @@ $ionicPlatform.ready(function () {
           pendingObservation();
         }
       }
-      });
-      
-    $timeout(function() {
+  });
+                     onGPS($cordovaGeolocation,LocationService,$ionicPopup);
+
+/*$timeout(function() {
           //$scope.closeLogin();
           //alert('came');
         
-            cordova.plugins.diagnostic.isGpsLocationEnabled(function(enabled){
+            cordova.plugins.diagnostic.isLocationEnabled(function(enabled){
               //alert(enabled);
                 if(enabled ){
+                  //alert('hh');
+                     $ionicPlatform.ready(function() {
+
                   onGPS($cordovaGeolocation,LocationService,$ionicPopup);
+                });
                 } else {
 
-                  /*var settingName = "location_source";
+                  //var settingName = "location_source";
                 
               var confirmPopup = $ionicPopup.alert({
                       title: 'GPS',
-                      template: "Location not found.Please enable gps in high accuracy mode. Click 'OK' to go to settings"
+                      template: "Location not found.Please enable Location Services for the app"
                     });
-                     confirmPopup.then(function(result) {
-
-                                 cordova.plugins.settings.openSetting(settingName, success,failure);
-                      });*/
+                     
 
                 }
 
             }, function(error){
-               // alert("The following error occurred: "+error);
+                alert("The following error occurred: "+error);
             });
-    }, 1000);
-//var options = {enableHighAccuracy:true};
-   var obsid;
+    }, 1000);*/
+
+       var obsid;
    $scope.execPendingObservation = function(){
-    //alert('clicked');
       var setHome1 = localStorage.getItem('Home');
       var executeVal1 = JSON.parse(setHome1);
       var execObs1 = executeVal1.ExecuteVal;
@@ -3847,21 +3910,20 @@ $ionicPlatform.ready(function () {
       } else if(iCheck == true && wifiSettings == true && execObs1 == 0){
         //alert("t,t");
         if(wCheck == true){
-          showToast($cordovaToast,"observations will be submitted soon");
+          showToast($cordovaToast,$filter('translate')('obsSoon'));
           getVar2.successVal = 0;
         getVar2.failedVal = 0;
               
       localStorage.setItem('countvariables',JSON.stringify(getVar2));
           pendingObservation();
         }else{
-          showToast($cordovaToast,"No WIFI connection");
+          showToast($cordovaToast,$filter('translate')('noWifiConnection'));
         }
       } else if(iCheck == false){
         //alert("f,f");
-        showToast($cordovaToast,"No internet connection");
+        showToast($cordovaToast,$filter('translate')('noInternetConnection'));
       }
    }
-
    $scope.execFailedObservation = function(){
     var dbCount=0;
       var query = "SELECT * FROM OBSERVATION WHERE STATUS= ? ";
@@ -3873,10 +3935,9 @@ $ionicPlatform.ready(function () {
               $cordovaSQLite.execute(db, query1).then(function(res1) {
                 dbCount++;
                 //alert(res.rows.length+" "+dbCount);
+               observationStatusController($scope, NewObservationService, $cordovaSQLite, $filter);
                 if(res.rows.length == dbCount){
-                                 observationStatusController($scope, NewObservationService, $cordovaSQLite);
-
-                  showToast($cordovaToast,"observations queued in pending lists, submitted soon");
+                  showToast($cordovaToast,$filter('translate')('inPending'));
                    $scope.execPendingObservation();
                 }
 
@@ -3895,11 +3956,9 @@ $ionicPlatform.ready(function () {
 
 
   }
- 
  function pendingObservation(){
   //$scope.callMethod++;
   //alert('pendingObservation');
-  //alert(executeVal.ExecuteVal);
   if(executeVal.ExecuteVal == 0){
     executeVal.ExecuteVal = 1;
     localStorage.setItem('Home',JSON.stringify(executeVal));
@@ -3912,13 +3971,14 @@ $ionicPlatform.ready(function () {
       //alert(res.rows.length);
       if(res.rows.length >0){
         $scope.idVal = res.rows.item(0)['id'];
-        $scope.offlineSubmit = JSON.parse(res.rows.item(0)['obslist']);
+                $scope.offlineSubmit = JSON.parse(res.rows.item(0)['obslist']);
 
-        var query1 = "UPDATE OBSERVATION SET STATUS='PROCESSING' WHERE ID ="+$scope.idVal;
+          var query1 = "UPDATE OBSERVATION SET STATUS='PROCESSING' WHERE ID ="+$scope.idVal;
         $cordovaSQLite.execute(db, query1).then(function(res) {
          // alert('came');
                       //console.log("INSERT ID -> " + res.insertId);
-                      observationStatusController($scope, NewObservationService, $cordovaSQLite);
+        observationStatusController($scope, NewObservationService, $cordovaSQLite, $filter);
+
         
         $scope.offlineSubmit['fromDate'] = $filter('date')( $scope.offlineSubmit.fromDate,"dd/MM/yyyy" );
 
@@ -3943,54 +4003,39 @@ $ionicPlatform.ready(function () {
         //alert(err);
           console.error(err);
         });
-
-
-
-        
-        //alert($scope.offlineSubmit['fromDate']);
-        //alert($scope.offlineSubmit['placeName'].substr(0,9));
        
-        //alert(JSON.stringify($scope.offlineSubmit));
-        
-      }else {
-         executeVal.ExecuteVal = 0;
-         localStorage.setItem('Home',JSON.stringify(executeVal));
-
-      }
-    }, function (err) {
-      //alert(err);
-        console.error("newwww"+err);
-    });
+     }else {
+      executeVal.ExecuteVal = 0;
+      localStorage.setItem('Home',JSON.stringify(executeVal));
+     }
+   }, function (err) {
+     //alert(err);
+       console.error("newwww"+err);
+   });
 
 
-  }
+ }
+//console.log($ionicSideMenuDelegate);
   /*LocationService.GetLocation().then(function(data){
-  alert(JSON.stringify(data));
-  }, function(err){
-              //alert("Nosuccess");
-             alert("err1"+JSON.stringify(err));
-               
-            });*/
-
-   
+  console.log(data);
+  });*/
   
-/*BrowseService.GetBrowseInfo().then(function(speciesGroup){
+BrowseService.GetBrowseInfo().then(function(speciesGroup){
 
-  BrowseService.setSpeciesGroups(speciesGroup['data']['model']['instanceList']);
-  alert(JSON.stringify(speciesGroup));
+  console.log(speciesGroup);
 
-} );*/
+} );
 
 UserGroupService.GetJoinedGroups().then(function(groups){
 
   console.log(groups['data']['model']);
   UserGroupService.SetUserJoinGroups(groups);
   if(localStorage.getItem('UserGroupArray')!== null){
-   localStorage.removeItem('UserGroupArray');
-   localStorage.setItem('UserGroupArray',JSON.stringify(groups));
-   } else {
-     localStorage.setItem('UserGroupArray',JSON.stringify(groups));
-   }
+    localStorage.removeItem('UserGroupArray');
+    localStorage.setItem('UserGroupArray',JSON.stringify(groups));
+  } else {
+    localStorage.setItem('UserGroupArray',JSON.stringify(groups));
+  }
 });
 
 
@@ -4000,13 +4045,14 @@ UserGroupService.GetJoinedGroups().then(function(groups){
 
  function fileUpload(){
   //alert("fileUpload");
-  var calcPerc = 0;
+    var calcPerc = 0;
+
       $scope.times = 0;
       $scope.storingImg = $scope.offlineSubmit['imagePath'];
       var tokenvar = localStorage.getItem('USER_KEY');
       var tokenvar1 = JSON.parse(tokenvar);
       var token = tokenvar1.userKey;
-      var appkey = "f947a3cd-1409-4a30-9ca2-4cdfcc5fd0a9";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
+      var appkey = "a4fbb540-0385-4fff-b5da-590ddb9e2552";//"fc9a88b5-fac9-4f01-bc12-70e148f40a7f";
       $scope.count =0;
       $scope.newImageStr = [];
       //console.log($scope.newobs);
@@ -4016,10 +4062,10 @@ UserGroupService.GetJoinedGroups().then(function(groups){
 
        for(var i = 0;i < $scope.offlineSubmit['imagePath'].length; i++){
        // alert('came');
-        
+       
           var imageLink = $scope.offlineSubmit['imagePath'][i]['path'] ;
           if(imageLink.match("http://")){
-            editCheck = 1;
+             editCheck = 1;
            var nameCreate =  "/"+imageLink.split('//')[2];
 
               $scope.newImageStr.push(nameCreate);
@@ -4051,13 +4097,11 @@ UserGroupService.GetJoinedGroups().then(function(groups){
             options.mimeType = "image/jpg",
             options.httpMethod = "POST",
             options.headers =  {
-              Connection: "close",
             "X-Auth-Token":token,
             "X-AppKey":appkey
           }
 
           var ft = new FileTransfer();
-
           ft.onprogress = function(progressEvent) {
             //alert(JSON.stringify(progressEvent));
               if (progressEvent.lengthComputable) {
@@ -4110,8 +4154,7 @@ UserGroupService.GetJoinedGroups().then(function(groups){
           }
           function failed(err){
             $scope.times++;
-           // alert("file transfer error");
-            console.log("file transfer"+err)
+            //alert("file transfer"+err);
             if($scope.times == 1){
             storeStatusCheck();
           }
@@ -4120,7 +4163,6 @@ UserGroupService.GetJoinedGroups().then(function(groups){
           
 
           function storeResourceDetails(){
-            
             var count1 = 0;
             console.log("newImgstr" + Object.keys($scope.newImageStr).length);
             //alert(Object.keys($scope.newImageStr).length);
@@ -4129,11 +4171,12 @@ UserGroupService.GetJoinedGroups().then(function(groups){
               count1++;
               $scope.offlineSubmit["file_"+(i+1)] = $scope.newImageStr[i];
               $scope.offlineSubmit["type_"+(i+1)] = "IMAGE";
-              $scope.offlineSubmit["license_"+(i+1)] = $scope.offlineSubmit['imagePath'][i]['license'];//"CC_BY";
+              $scope.offlineSubmit["license_"+(i+1)] = $scope.offlineSubmit['imagePath'][i]['license'];
               
               if(count1 == Object.keys($scope.newImageStr).length){
                 //alert("entered");
-                delete $scope.offlineSubmit['imagePath'];
+                            delete $scope.offlineSubmit['imagePath'];
+
                 submitObservation();
               }
             }
@@ -4151,12 +4194,44 @@ UserGroupService.GetJoinedGroups().then(function(groups){
                 $scope.offlineSubmit['recoName'] = "Unknown"  
             }
             if($scope.offlineSubmit.hasOwnProperty('commonName')){
-             
+              /*if($scope.offlineSubmit['commonName'].length>0){
+               commonName = $scope.offlineSubmit['commonName'];
+             }*/
             } else {
               $scope.offlineSubmit['commonName']  = ''
             }
              $scope.offlineSubmit['imagePath'] = $scope.storingImg;
-             var query = "UPDATE OBSERVATION SET STATUS='FAILED', OBSLIST='"+JSON.stringify($scope.offlineSubmit)+"' WHERE ID ="+$scope.idVal;
+            /*if($scope.offlineSubmit['recoName'] != "Unknown"){
+               sciName = $scope.offlineSubmit['recoName'];
+            } else {
+              sciName = "Unknown";
+            }
+            if($scope.offlineSubmit.hasOwnProperty('commonName')){
+              if($scope.offlineSubmit['commonName'].length>0){
+               commonName = $scope.offlineSubmit['commonName'];
+             }
+            } else {
+              commonName = "";
+            }
+            if($scope.offlineSubmit['notes'].length>0){
+               obsNotes = $scope.offlineSubmit['notes'];
+            } else {
+              obsNotes = "";
+            }
+            $scope.failedObs = {};
+
+            $scope.failedObs['recoName'] = sciName ;
+            $scope.failedObs['commonName'] = commonName ;
+            //$scope.failedObs['status'] =$filter('date')( $scope.newobs.date,"dd/MM/yyyy" );
+            $scope.failedObs['fromDate'] = $filter('date')( $scope.offlineSubmit.fromDate,"dd/MM/yyyy" );
+            $scope.failedObs['placeName'] = $scope.offlineSubmit['placeName'];
+            $scope.failedObs['notes'] = obsNotes ;
+            $scope.failedObs['imagePath'] = $scope.storingImg;//$scope.offlineSubmit['imagePath'];
+            //alert($scope.failedObs);
+            //console.log()
+            //NewObservationService.SetStatus(sciName, commonName, "FAILURE", $scope.newobs.date, $scope.locationAddress, obsNotes, $scope.imgURI);
+             */
+           var query = "UPDATE OBSERVATION SET STATUS='FAILED', OBSLIST='"+JSON.stringify($scope.offlineSubmit)+"' WHERE ID ="+$scope.idVal;
               $cordovaSQLite.execute(db, query).then(function(res) {
                 var setvar = localStorage.getItem('countvariables');
               var getVar = JSON.parse(setvar);
@@ -4195,18 +4270,10 @@ UserGroupService.GetJoinedGroups().then(function(groups){
 
             //alert($scope.offlineSubmit['fromDate']);
           if(editCheck==0){
-            //alert(JSON.stringify($scope.offlineSubmit))Z;
             NewObservationService.SubmitObservation($scope.offlineSubmit).then(function(obsResponse){
-              console.log(JSON.stringify(obsResponse.data))
-              //alert(JSON.stringify(obsResponse.data))
-              //alert(obsResponse.data.success);
-              if(obsResponse.data.success == true){
-                var setvar = localStorage.getItem('countvariables');
-              var getVar = JSON.parse(setvar);
-                getVar.successVal++;
               
-              showToast($cordovaToast,"Successfull: "+getVar.successVal+" failed: "+getVar.failedVal);
-              localStorage.setItem('countvariables',JSON.stringify(getVar));
+              //alert("success" + obsResponse.data.success);
+              if(obsResponse.data.success == true){
                 var query1 = "DELETE FROM OBSERVATION WHERE ID ="+$scope.idVal;
                //alert(query1);
                 $cordovaSQLite.execute(db, query1).then(function(result) {
@@ -4219,15 +4286,15 @@ UserGroupService.GetJoinedGroups().then(function(groups){
                 });
 
               }
-              if(obsResponse.data.success == false){
-                //alert('response false');
-                $scope.offlineSubmit["file_name"] = $scope.newImageStr[0].slice(1);
+               if(obsResponse.data.success == false){
+             $scope.offlineSubmit["file_name"] = $scope.newImageStr[0].slice(1);
+
                storeStatusCheck();
               }
               console.log(obsResponse);
             },
             function(err){
-             // alert("Submission error");
+             // alert("Nosuccess");
               $scope.offlineSubmit["file_name"] = $scope.newImageStr[0].slice(1);
 
               console.log(err);
@@ -4278,13 +4345,13 @@ UserGroupService.GetJoinedGroups().then(function(groups){
 
               }
               if(obsResponse.data.success == false){
-               // alert("error1");
+                //alert("error1");
                storeStatusCheck();
               }
               console.log(obsResponse);
             },
             function(err){
-              //alert("Nosuccess1");
+              //alert("Nosuccess");
               console.log(err);
                storeStatusCheck();
             });
@@ -4293,25 +4360,19 @@ UserGroupService.GetJoinedGroups().then(function(groups){
         }
 
           function callOffline(){
-            //alert('cald');
-            setTimeout(function(){
-                  observationStatusController($scope, NewObservationService, $cordovaSQLite);
-              var iCheck = Icheck();
-              if(iCheck == true){
-                pendingObservation();
-              }else{
-                 executeVal.ExecuteVal = 0;
-                 localStorage.setItem('Home',JSON.stringify(executeVal));
-                 //observationStatusController($scope, NewObservationService, $cordovaSQLite);
-              }
-            },500);
+            observationStatusController($scope, NewObservationService, $cordovaSQLite, $filter);
+            if(check == true){
+              pendingObservation();
+            }else {
+              executeVal.ExecuteVal = 0;
+              localStorage.setItem('Home',JSON.stringify(executeVal));
+            }
           }
-
           $scope.locationFind = function(dbID){
             var iCheck = Icheck();
 
                 if(iCheck == false){
-                  showToast($cordovaToast,"No Internet");
+                  showToast($cordovaToast,$filter('translate')('noInternet'));
                   return;
                 }else {
                   //$('ion-nav-bar').addClass('hide');
@@ -4330,15 +4391,14 @@ function success(){
   function failure(){
     //alert('failure');
   }
-
-appne.controller('MyCollectionCtrl',[ '$scope', '$http', 'BrowseService','LocationService', '$ionicPopup', '$cordovaProgress', 'UserGroupService','$ionicHistory','$state', function($scope,$http,BrowseService,LocationService,$ionicPopup,$cordovaProgress,UserGroupService,$ionicHistory,$state){
+appne.controller('MyCollectionCtrl',[ '$scope', '$http', 'BrowseService','LocationService', '$ionicPopup', '$cordovaProgress', 'UserGroupService', '$ionicHistory', '$state', '$filter', function($scope,$http,BrowseService,LocationService,$ionicPopup,$cordovaProgress,UserGroupService,$ionicHistory,$state,$filter){
 
 //console.log($("#myCollectionMsg").html());
-  BrowseService.SetTrackOrder(3);
+    BrowseService.SetTrackOrder(3);
 
-$scope.details = [];
+  $scope.details = [];
   $scope.innerDetails = [];
-$scope.arrayIDBrowse = [];
+  $scope.arrayIDBrowse = [];
 var tokenvar = localStorage.getItem('USER_KEY');
 var tokenvar1 = JSON.parse(tokenvar);
 var userid = tokenvar1.userID;
@@ -4347,38 +4407,34 @@ $scope.listParams = {
   "offset": 0,
   "user": userid
 }
+var inter = Icheck();
+  if(inter == false){
+    $ionicPopup.alert({
+      title: $filter('translate')('error'),
+      content: $filter('translate')('makeSure')//'You must submit atleast one image'
+    });
+    return;
+  } else {
+    $cordovaProgress.showSimple(true) ;
+    BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
 
-  var inter = internetCheck($ionicPopup);
-    if(inter == false){
-      
-      return;
-    }else {
-      //$cordovaProgress.showSimple(true);
-                $(".modal1").show();
+      //alert(obsList["data"]["model"]["observationInstanceList"].length);
+      if(obsList["data"]["model"]["observationInstanceList"].length > 0){
+        $cordovaProgress.hide();
+        $("div #myCollectionList").show();
+        arrayData($scope,obsList["data"]["model"]["observationInstanceList"],1,BrowseService);
+      } else {
+        $cordovaProgress.hide();
+        $("div #myCollectionMsg").show();
+      }
+    } );
 
+    UserGroupService.GetJoinedGroups().then(function(groups){
 
-      BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
-
-        //alert(obsList["data"]["model"]["observationInstanceList"].length);
-        if(obsList["data"]["model"]["observationInstanceList"].length > 0){
-          //$cordovaProgress.hide();
-                    $(".modal1").hide();
-
-          $("div #myCollectionList").show();
-          arrayData($scope,obsList["data"]["model"]["observationInstanceList"],1,BrowseService);
-        } else {
-          //$cordovaProgress.hide();
-                    $(".modal1").hide();
-
-          $("div #myCollectionMsg").show();
-        }
-      } );
-      UserGroupService.GetJoinedGroups().then(function(groups){
-
-         console.log(groups['data']['model']);
-         UserGroupService.SetUserJoinGroups(groups);
-        
-       });
+      console.log(groups['data']['model']);
+      UserGroupService.SetUserJoinGroups(groups);
+     
+    });
   }
 
 $scope.loadMore = function() {
@@ -4394,37 +4450,34 @@ $scope.loadMore = function() {
       arrayData($scope,obsList["data"]["model"]["observationInstanceList"],2,BrowseService);
       $scope.$broadcast('scroll.infiniteScrollComplete');
     } );
-
-   
     
   };
-   UserGroupService.GetUserGroups().then(function(groups){
+  $scope.goNewObs = function(){
+    $ionicHistory.clearCache().then(function(){
+      $state.go('app.newObservation');
+    })
+  }
+  UserGroupService.GetUserGroups().then(function(groups){
 
     console.log(groups['data']['model']);
     UserGroupService.SetUserGroups(groups['data']['model']['userGroupInstanceList']);
   });
 
-
-  $scope.goNewObs = function(){
-      $ionicHistory.clearCache().then(function(){ 
-          $state.go('app.newObservation');
-        })
-  }
 }]);
 
-appne.controller('ListController',[ '$scope', '$state','$http', 'BrowseService', '$ionicPopup','UserGroupService', function($scope,$state,$http,BrowseService,$ionicPopup,UserGroupService){
-  internetCheck($ionicPopup);
-  BrowseService.SetTrackOrder(1);
+appne.controller('ListController',[ '$scope', '$state','$http', 'BrowseService', '$ionicPopup','UserGroupService', '$filter', function($scope,$state,$http,BrowseService,$ionicPopup,UserGroupService,$filter){
+  internetCheck($ionicPopup, $filter);
+      BrowseService.SetTrackOrder(1);
+
   $scope.showButton = true;
   console.log("hi");
   $scope.details = [];
   $scope.innerDetails = [];
   $(".modal1").show();
   $scope.arrayIDBrowse = [];
-  var groupID = BrowseService.getSpeciesGroupID();
+
 $scope.listParams = {
   offset:0,
-  sGroup:groupID,
   type:"nearBy",
   maxRadius:50000,
   max:12
@@ -4476,12 +4529,6 @@ BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
     UserGroupService.SetUserGroups(groups['data']['model']['userGroupInstanceList']);
   });
 
-  UserGroupService.GetJoinedGroups().then(function(groups){
-
-    console.log(groups['data']['model']);
-    UserGroupService.SetUserJoinGroups(groups);
-  });
-
   $scope.enableMap = function(){
    // alert('map');
     $state.go("app.viewMap");
@@ -4489,34 +4536,24 @@ BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
  
 }]);
 
-appne.controller('ObsNearByCtrl', [ '$scope', '$state', '$http', 'BrowseService','LocationService', '$ionicPopup', '$ionicHistory', 'UserGroupService', function($scope,$state,$http,BrowseService,LocationService,$ionicPopup, $ionicHistory,UserGroupService){
+appne.controller('ObsNearByCtrl', [ '$scope', '$state', '$http', 'BrowseService','LocationService', '$ionicPopup', '$filter',function($scope,$state,$http,BrowseService,LocationService,$ionicPopup,$filter){
 
-   BrowseService.SetTrackOrder(2);
+internetCheck($ionicPopup, $filter);
+    BrowseService.SetTrackOrder(2);
 
-internetCheck($ionicPopup);
  $scope.details = [];
   $scope.innerDetails = [];
-$scope.arrayIDBrowse = [];
+  $scope.arrayIDBrowse = [];
 $(".modal1").show();
-  var groupID = BrowseService.getSpeciesGroupID();
 
 $scope.listParams = {
   "offset":0,
-  "sGroup":groupID,
   "type":"nearBy",
   "maxRadius":50000,
   "long":'',
   "lat":'',
-  "max":12
+  'max':12
 }
-setTimeout(function(){
-      if($('ion-nav-bar').hasClass('hide')){
-        //alert('came');
-        $('ion-nav-bar').removeClass('hide');
-        //$('ion-view').css('padding-top','44px');
-        //$('ion-content').css('margin-top','43px');
-      }
-    },100);
 var location = LocationService.getCurrentLocation();
 
 $scope.listParams["long"] = location["longitude"];
@@ -4543,12 +4580,6 @@ BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
     
   };
 
-  UserGroupService.GetJoinedGroups().then(function(groups){
-
-    console.log(groups['data']['model']);
-    UserGroupService.SetUserJoinGroups(groups);
-  });
-
   $scope.enableMap = function(){
     //alert('map');
     $state.go("app.viewMap");
@@ -4557,27 +4588,26 @@ BrowseService.GetBrowseList($scope.listParams).then(function(obsList){
 }]);
 
 
-appne.controller('JoinGroupCtrl',[ '$scope', '$http','$compile','UserGroupService', '$ionicPopup', '$cordovaProgress', function($scope,$http,$compile,UserGroupService,$ionicPopup,$cordovaProgress){
+appne.controller('JoinGroupCtrl',[ '$scope', '$http','$compile','UserGroupService', '$ionicPopup', '$cordovaProgress', '$filter', function($scope,$http,$compile,UserGroupService,$ionicPopup,$cordovaProgress,$filter){
   console.log("jgroup");
-  $scope.usrGrpDetails = [];
-    var inter = internetCheck($ionicPopup);
-          if(inter == false){
-            
-            return;
-          }else {  /*$http.get('js/userGroup.json').success(function(data){
-        //$scope.artists = data;
-        //console.log($scope.artists.observationInstanceList );
-        userGroupData($scope,data.userGroupInstanceList);
-        
-      });*/
-      //$cordovaProgress.showSimple(true);
-        $(".modal1").show();
+$scope.usrGrpDetails = [];
 
-      console.log($(".button").html());
-      //$("div .hell").hide()
-
-
-      $scope.noMoreGroups = true;
+var inter = Icheck($ionicPopup);
+      if(inter == false){
+        $ionicPopup.alert({
+            title: $filter('translate')('error'),
+            content: $filter('translate')('makeSure')//'You must submit atleast one image'
+          });
+        return;
+      } else {
+        $cordovaProgress.showSimple(true) ;
+  /*$http.get('js/userGroup.json').success(function(data){
+    //$scope.artists = data;
+    //console.log($scope.artists.observationInstanceList );
+    userGroupData($scope,data.userGroupInstanceList);
+    
+  });*/
+$scope.noMoreGroups = true;
 
       $scope.listParams = {
         "offset":0,
@@ -4587,7 +4617,7 @@ appne.controller('JoinGroupCtrl',[ '$scope', '$http','$compile','UserGroupServic
 UserGroupService.GetUserGroups($scope.listParams).then(function(groups){
       //var groups = UserGroupService.GetUserJoinGroups()
         console.log(groups);
-          $(".modal1").hide();
+          $cordovaProgress.hide();
 
         //$cordovaProgress.hide();
         userGroupData($scope,groups['data']['model'].userGroupInstanceList,UserGroupService);
@@ -4610,13 +4640,6 @@ UserGroupService.GetUserGroups($scope.listParams).then(function(groups){
 
     
   };
-
-
-
-
-
-
-      
    /*$http.get('js/joinedGroup.json').success(function(data){
     //$scope.artists = data;
     console.log(data.observations );
@@ -4635,26 +4658,29 @@ UserGroupService.GetUserGroups($scope.listParams).then(function(groups){
 
     console.log(id,name);
     console.log(UserGroupService);
+
+
     var confirmPopup = $ionicPopup.confirm({
-          title: 'Join Group',
-          template: 'Do you really want to join in '+name 
+          title: $filter('translate')('joinCtrl'),
+          template: $filter('translate')('confirmationJoin')+" "+name 
         });
-         confirmPopup.then(function(result) {
+          confirmPopup.then(function(result) {
 
-            if(result) {
+             if(result) {
 
-             UserGroupService.JoinGroup(id).then(function(groups){
+              UserGroupService.JoinGroup(id).then(function(groups){
 
-               console.log(groups);
-               $("#button"+id).hide();
-               $("#joinedicon"+id).addClass("icon ion-checkmark-round");
+                console.log(groups);
+                $("#button"+id).hide();
+                $("#joinedicon"+id).addClass("icon ion-checkmark-round");
 
-             });
-            } else {
+              });
+             } else {
 
-            }
+             }
 
-          });
+           });
+
   }
 
 }]);
@@ -4669,38 +4695,38 @@ appne.filter('htmlContent', function($sce) {
 });
 
 appne.controller('NotificationController', function($scope, $state,$http, $ionicModal,NotificationService,$ionicPopup,$filter,$cordovaToast) {
-      
+
      $("#noNotifications").hide();
 
-      internetCheck($ionicPopup);
+
+    internetCheck($ionicPopup, $filter);
 
       $scope.items =[];
       $scope.values = {
         "offset": 0,
         "max":12
       }
-       $scope.sendNotify = false;
+      $scope.sendNotify = false;
       var tokenvar = localStorage.getItem('USER_KEY');
       var tokenvar1 = JSON.parse(tokenvar);
       var userId = tokenvar1.userID;
-      if(tokenvar1.Role != undefined && tokenvar1.Role != ""){
+      /*if(tokenvar1.Role != undefined && tokenvar1.Role != ""){
       $scope.sendNotify = true;
 
-      }
+      }*/
+
         $(".modal1").show();
 
       NotificationService.GetListNotifications($scope.values).then(function(response){
           $(".modal1").hide();
-        if(response.data.length == 0){
-          $("#noNotifications").show();
-        }else {
-               $("#noNotifications").hide();
 
-        for(var i=0;i<response.data.length;i++){
-          $scope.items.push({"id":i,"title":response.data[i]['title'],"desc":response.data[i]['description'],"time":$filter('date')(response.data[i]['dateCreated'])});
-         }
-       }
-        console.log(JSON.stringify(response));
+          if(response.data.length == 0){
+            $("#noNotifications").show();
+          }else {
+            for(var i=0;i<response.data.length;i++){
+              $scope.items.push({"id":i,"title":response.data[i]['title'],"desc":response.data[i]['description'],"time":$filter('date')(response.data[i]['dateCreated'])});
+            }
+          }
 
         });
 
@@ -4754,7 +4780,7 @@ appne.controller('NotificationController', function($scope, $state,$http, $ionic
        $scope.modal.show();
        });
       }
-      $scope.pushNotification = function(){
+      /*$scope.pushNotification = function(){
 
         if($scope.text.description == '' || $scope.text.title ==''){
                 showIonicAlert($ionicPopup,'Please enter all fields');
@@ -4785,9 +4811,9 @@ appne.controller('NotificationController', function($scope, $state,$http, $ionic
 
           }
 
-            var privateKey = 'e41f9bd80c3c8d096a64a393eee4013aa76f83c011800f1e';
+            var privateKey = '1d73dec2bd5d10538f670e286439a6e227b3cbf37fd3eb7e';
             var auth = btoa(privateKey + ':');
-            var appId = "e2179cec";
+            var appId = "2aada8cd";
             var req = {
             method: 'POST',
             url: 'https://push.ionic.io/api/v1/push',
@@ -4820,13 +4846,12 @@ appne.controller('NotificationController', function($scope, $state,$http, $ionic
           
         });
         
-      }
+      }*/
 });
 
 
 function arrayData($scope,observationInstanceList,num,BrowseService){
 
-console.log(observationInstanceList);
 BrowseService.setObsList(observationInstanceList);
   console.log("hi");
   //var arr = [];
@@ -4878,7 +4903,7 @@ BrowseService.setObsList(observationInstanceList);
     //
     
     }
-     $scope.arrayIDBrowse.push(id);
+    $scope.arrayIDBrowse.push(id);
     if(i == (observationInstanceList.length)-1){
       BrowseService.SetIDArrayBrowse($scope.arrayIDBrowse);
 
@@ -4899,10 +4924,10 @@ function userGroupData($scope,userGroupInstanceList,UserGroupService){
 
   for(i=0;i<userGroupInstanceList.length;i++){
 
-    $scope.usrGrpDetails.push({"id":userGroupInstanceList[i].id,"name":userGroupInstanceList[i].name});
+    usrGrp.push({"id":userGroupInstanceList[i].id,"name":userGroupInstanceList[i].name});
 
   }
-  //$scope.usrGrpDetails = usrGrp;
+  $scope.usrGrpDetails = usrGrp;
   console.log(usrGrp);
 
   UserGroupService.GetJoinedGroups().then(function(userGroups){
@@ -4932,15 +4957,15 @@ function checkGroup($scope,joinedgroup){
   
 }
 
-function internetCheck($ionicPopup){
-  //console.log(window.Connection);
+function internetCheck($ionicPopup, $filter){
+  console.log(window.Connection);
   if(window.Connection) {
     //alert("connection");
     if(navigator.connection.type == Connection.NONE) {
       //alert("no connection");
         $ionicPopup.alert({
-            title: 'ERROR',
-            content: "Plase make sure, you are connected to internet"//'You must submit atleast one image'
+            title: $filter('translate')('error'),
+            content: $filter('translate')('makeSure')//'You must submit atleast one image'
           });
       return false;
     }
@@ -4949,7 +4974,7 @@ function internetCheck($ionicPopup){
 
 function Icheck(){
   var connectionVal ;
-  //console.log(window.Connection);
+  console.log(window.Connection);
   if(window.Connection) {
     //alert("connection");
     if(navigator.connection.type == Connection.NONE) {
@@ -4961,7 +4986,6 @@ function Icheck(){
   }
   return connectionVal;
 }
-
 
 function wifiCheck(){
   var connectionVal ;
@@ -4978,6 +5002,32 @@ function wifiCheck(){
   return connectionVal;
 }
 
-function reverseStr(strVal){
-  return strVal.charAt(8)+""+strVal.charAt(9)+"/"+strVal.charAt(5)+""+strVal.charAt(6)+"/"+strVal.charAt(0)+""+strVal.charAt(1)+""+strVal.charAt(2)+""+strVal.charAt(3);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

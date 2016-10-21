@@ -1,8 +1,8 @@
 
-<ion-view view-title="Location" >
+<ion-view view-title="{{'location' | translate}}" >
 <ion-nav-buttons side="right">
 <button class="button button-clear" ng-click="getLocation()">
-        ok
+        {{'ok' | translate}}
       </button>
 </ion-nav-buttons>
 <ion-nav-bar class="bar-positive">
@@ -10,9 +10,9 @@
       </ion-nav-back-button>
       </ion-nav-bar>
 <ion-content >
-<div style="width: 95%;margin-left: 2.5%;">
+<div>
 <!--pre id="texttop">Loading</pre-->
-<input type="text" id="texttop" style="width:100%;border: 1px solid #444444;border-radius: 6px;" g-places-autocomplete ng-model="myScopeVar" placeholder="Search for Location"/>
+<input type="text" id="texttop" style="width:100%;" g-places-autocomplete  ng-model="myScopeVar" placeholder="Search for Location" />
 </div>
     <div id="map" data-tap-disabled="true"></div>
 </ion-content>

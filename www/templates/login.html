@@ -1,33 +1,35 @@
 <ion-view >
   <div class="bar bar-header bar-positive">
-  <h1 class="title">Login</h1>
+  <h1 class="title">{{"login" | translate}}</h1>
 </div>
   <ion-content >
-  <div class="modal1"></div>
+    <div class="modal1"></div>
+
   <br><br><br>
     <form ng-submit="doLogin()">
       <div class="list">
-        <label class="item item-input" style="background-color: #e7e5b4;" >
+        <label class="item item-input">
           <!--span class="input-label">Username :</span-->
-          <input type="text" ng-model="loginData.username" placeholder="Username">
+          <input type="text" ng-model="loginData.username" placeholder="{{'userName' | translate}}">
         </label>
-        <label class="item item-input" style="background-color: #e7e5b4;" >
+        <label class="item item-input">
           <!--span class="input-label">Password :</span-->
-          <input id="pass" type="password" ng-model="loginData.password" placeholder="Password">
+          <input id="pass" type="password" ng-model="loginData.password" placeholder="{{'password' | translate}}">
         </label>
         <label>
-          <button class="button button-block button-positive" type="submit">Log in</button>
+          <button class="button button-block button-positive" type="submit">{{"login" | translate}}</button>
         </label>
       </div>
       <div>
-        <a href="#/newUser" class="alignleft">New User</a>
+        <a href="#/newUser" class="alignleft">{{"NewUser" | translate}}</a>
       
-        <a href="#" class="alignright" ng-click="forgotPassword()">Forgot password ?</a>
+        <a href="#" class="alignright" ng-click="forgotPassword()">{{"forgotPassword" | translate}}</a>
       </div>
 
     </form>
     <br>
-    <h4 align="center">Or</h4>
+    <br>
+    <h4 align="center">{{"or" | translate}}</h4>
     <br>
     <div align="center">
       <img src="img/google1.png" ng-click="googleLogin()" height="60px" width="60px">
@@ -35,9 +37,9 @@
       </div>
           <div align="center">
 
-      <a href="#/app/aboutUs/2"  style="text-decoration:none; color:#468847;">About</a>
+      <a href="#/app/aboutUs/2"  style="text-decoration:none; color:#468847;">{{"about" | translate}}</a>
       </div>
-      
+  </ion-content>
 </ion-view>
 
 
