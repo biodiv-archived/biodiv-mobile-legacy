@@ -51,7 +51,7 @@
    <a class="button button-icon  ion-ios-gear-outline" href="#/app/settings"></a>
   </ion-nav-buttons-->
   <ion-content >
-  <a ng-if="obsStatusFailedList" class="button button-positive" ng-click="execFailedObservation()" style="top: 4px;width: 100%;border-radius: 15px; ">Submit Failed Observations</a>
+  <a ng-if="pendingObservation && obsStatusFailedList" class="button button-positive" ng-click="execFailedObservation()" style="top: 4px;width: 100%;border-radius: 15px; ">Submit Failed Observations</a>
    
   <div ng-if="obsStatusFailedList" >
          <ion-list class="item-icon-right">

@@ -11,7 +11,6 @@
   <ion-scroll direction="x" style="height:250px; min-height: 200px; overflow: scroll; white-space: nowrap;">
   <div class="img-wrap"  ng-repeat="images in imgURI" id="{{images.id}}">
   <span class="close" ng-click="removeImage({{images.id}})">&times;</span>
-  
       <img  ng-show="imgURI !== undefined"  ng-src="{{images.path}}" id="{{images.valId}}" style="height:200px;width:150px; padding: 5px 5px 5px 5px;"/>
       <!--ion-item class="item" id="license{{images.id}}" style="height:20px;width:150px;left: 25px;background: url('img/cc-by.png') no-repeat" ng-click="showLicense({{images.id}});" > </ion-item-->
       <div class="licImage">
@@ -37,11 +36,12 @@
          <ion-item class="listItem" ng-click="categorySelect()" >
         <span >Select Category </span>
          <i class="icon ion-chevron-right "></i>
-         <p class="alignright" id="categoryName" style="margin-right:20px;">{{nameCategory}}</p>
+         <p class="alignright" id="categoryName" style="margin-right:20px;"></p>
 
          </ion-item>
-         <ion-item class="listItem item-input" id="dateSight" ng-click="openDate()">
-        <span class="input-label" >Date Sighted </span>{{newobs.date}}
+         <ion-item class="listItem item-input" id="dateSight">
+        <span class="input-label" >Date Sighted </span>
+        <input type="date" ng-model="newobs.date">
          <i class="icon ion-chevron-right "></i>
          </ion-item>
          <ion-item class="listItem">
@@ -73,7 +73,7 @@
          <ion-item class="listItem" ng-click="userGroup();">
         <span >Select UserGroups </span>
          <i class="icon ion-chevron-right "></i>
-         <p class="alignright" id="uGroupText" style="margin-right:20px;">{{usergroupLength}}</p>
+         <p class="alignright" id="uGroupText" style="margin-right:20px;"></p>
          </ion-item>
          </div>
          </ion-list>
@@ -89,4 +89,11 @@
 
   </ion-content>
 </ion-view>
+
+
+
+
+
+
+
 

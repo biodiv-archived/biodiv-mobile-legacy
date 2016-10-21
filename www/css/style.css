@@ -1,7 +1,7 @@
 /* Empty. Add your own CSS if you like */
 .wrapper{
-	/*text-align: center;
-	margin-top: 50%;*/
+  /*text-align: center;
+  margin-top: 50%;*/
    top: 50%;
     -webkit-transform: translateY(-50%);
     -moz-transform: translateY(-50%);
@@ -13,18 +13,18 @@
     width:100%;
 }
 .buttontop{
-	  margin-top: 18px;
-	  border-radius: 7px;
+    margin-top: 18px;
+    border-radius: 7px;
 }
 .alignleft {
-	float: left;
-	text-decoration: none;
-	color:green;
+  float: left;
+  text-decoration: none;
+  color:green;
 }
 .alignright {
-	float: right;
-	text-decoration: none;
-	color:green;
+  float: right;
+  text-decoration: none;
+  color:green;
 }
 .wide-as-needed {
   overflow: scroll;
@@ -34,7 +34,7 @@
   min-width: 100%;
 }
 .listItem{
-	border-radius: 7px;
+  border-radius: 7px;
 
 }
 .scroll {
@@ -46,7 +46,7 @@
     height: 100%;
 }
 #Locationval {
-		word-wrap: break-word;
+    word-wrap: break-word;
 }
 .modal1 {
     display:    none;
@@ -114,50 +114,50 @@
 }
 
 .button.button-positive {
-  background-color: #452715;
-    border-color: #452715;
+  background-color: #444444;
+    border-color: #444444;
 }
 
 .bar.bar-positive {
-  background: url("../img/title_bar_bg.png");
+  background: url("../img/title_bar_bg.jpg");
   border-color:transparent;
-  color:#dcdc5b;
+  color:#db7421;
 }
 .bar.bar-positive .title {
-  color:#dcdc5b;
+  color:#db7421;
 }
 
 .item .item-content {
-  background-color: #e7e5b4 ;
+  background-color: #f0fccf ;
   
 }
 .pane  {
-  background-color: #e7e5b4 ;
+  background-color: #f0fccf ;
   
 }
 .bar.bar-positive.bar-footer{
-    background:#452715;
+    background:#444444;
 }
 .bar.bar-positive.bar-footer .title{
     color:white;
 }
 
 .item-checkbox {
-  background-color: #e7e5b4;
+  background-color: #f0fccf;
 }
 
 .scroll-content{
-  background-color: #e7e5b4;
+  background-color: #f0fccf;
 }
 
 .bar-positive .button.button-clear {
-  color:#452715;
+  color:#444444;
 }
 
 .bar-positive .button.button-icon {
   /*border-color : #a52a2a;
   background: lightgray;*/
-  color: #452715;
+  color: #444444;
   /*border-radius: 17px;*/
 }
 .item-button-right {
@@ -210,5 +210,5 @@
 }
 
 .tabs-positive, .tabs {
-  background-color: #452715
+  background-color: #444444
 }

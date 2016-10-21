@@ -4,7 +4,7 @@
   <div class="modal1"></div>
   <div id="myCollectionList" style="display:none;">
          <ion-list class="item-icon-right">
-         <ion-item class="item-thumbnail-left item-text-wrap" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
+         <ion-item class="item-thumbnail-left" ng-repeat='item in details track by $index' href="#/app/browsedetails/{{item.id}}">
          <img src="{{item.iconUrl}}" alt="{{item.sciName}} photo">
          <h2>{{item.scientificName}}</h2>
          <p>{{item.CommonName}}</p>
